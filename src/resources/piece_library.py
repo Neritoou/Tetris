@@ -1,8 +1,7 @@
-from typing import Dict, List
-from src.typed_class import PieceData, PieceSurfaces
-import numpy as np
 import pygame
-# (!) ARREGLAR IMPORTS
+import numpy as np
+from typing import Dict, List
+from util import PieceData, PieceSurfaces
 
 class PieceLibrary:
     """
@@ -34,9 +33,10 @@ class PieceLibrary:
         matrices = self._generate_rotations(base_matrix)
 
         surfaces: PieceSurfaces = {
-            state: self._build_piece(base_matrix, block)
-            for state, block in blocks.items()
-        }
+                "normal": self._build_piece(base_matrix, blocks["normal"]),
+                "placed": self._build_piece(base_matrix, blocks["placed"]),
+                "ghost": self._build_piece(base_matrix, blocks["ghost"]),
+            }
 
         self._pieces[name] = { "matrices": matrices, "surfaces": surfaces }
 

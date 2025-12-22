@@ -1,13 +1,12 @@
 import pygame
 import numpy as np
 from typing import Dict, Tuple, TypeVar
-from src.images import SpriteSheet
-from src.piece_library import PieceLibrary, PieceSurfaces
-from src.typed_class import PieceData
-from src.constants import PIECE_DEFINITIONS, BLOCK_W, BLOCK_H, BLOCK_PW, BLOCK_PH
-# (!) ARREGLAR IMPORTS
+from .spritesheet import SpriteSheet
+from .piece_library import PieceLibrary, PieceData, PieceSurfaces
+from ..constants import PIECE_DEFINITIONS, BLOCK_W, BLOCK_H, BLOCK_PW, BLOCK_PH
 
 T = TypeVar("T")
+K = TypeVar("K")
 
 class ResourceManager:
     """Gestor de recursos del juego: imágenes, sonidos, fuentes, spritesheets y piezas."""
@@ -38,7 +37,7 @@ class ResourceManager:
 
     def load_font(self, key: str, path: str, size: int) -> None:
         """Carga y almacena una fuente."""
-        self._assert_not_loaded(self.fonts,key,"Font")
+        self._assert_not_loaded(self.fonts, (key,size), "Font")
         self.fonts[(key,size)] = pygame.font.Font(path, size)
 
     def load_spritesheet(self, key: str, path: str, frame_size: Tuple[int,int], padding: Tuple[int,int] = (0,0)) -> None:
@@ -63,8 +62,7 @@ class ResourceManager:
         return self._get_resource(self.sounds, key, "Sound")
 
     def get_font(self, key: str, size: int) -> pygame.font.Font:
-        """Obtiene una fuente cargada."""
-        return self._get_resource(self.fonts, key, "Font")
+        return self._get_resource(self.fonts, (key, size), "Font")
     
     def get_spritesheet(self, key: str) -> SpriteSheet:
         """Obtiene un spritesheet cargado."""
@@ -112,7 +110,7 @@ class ResourceManager:
             # Se obtiene directamente las Surfaces de los Bloques para la Pieza
             frames = sheet.get_frames_at_col(col) 
             # Se asignan a su respectivo diccionario
-            blocks = {
+            blocks: PieceSurfaces = {
                 "normal": frames[0],
                 "placed": frames[1],
                 "ghost": frames[2]
@@ -122,13 +120,13 @@ class ResourceManager:
 
 
     # --- HELPERS ---
-    def _assert_not_loaded(self, container: Dict[str, T], key: str, label: str) -> None:
+    def _assert_not_loaded(self, container: Dict[K, T], key: K, resource_type: str) -> None:
         """Verifica que un recurso no esté previamente cargado."""
         if key in container:
-            raise ValueError(f"ResourceManager: {label} '{key}' ya está cargado")
+            raise ValueError(f"ResourceManager: {resource_type} '{key}' ya está cargado")
 
 
-    def _get_resource(self, container: Dict[str, T], key: str, resource_type: str) -> T:
+    def _get_resource(self, container: Dict[K, T], key: K, resource_type: str) -> T:
         """Obtiene un recurso de un diccionario, lanzando KeyError si no existe."""
         if key not in container:
             raise KeyError(f"Resource Manager: {resource_type} '{key}' no está cargado")

@@ -1,0 +1,12 @@
+{
+    "controls": {
+        "play": {
+            "move_left": ["left", "a"],
+            "move_right": ["right", "d"]
+        },
+        "ui": {
+            "select": ["enter"],
+            "back": ["escape"]
+        }
+    }
+}

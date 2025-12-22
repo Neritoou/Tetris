@@ -117,7 +117,6 @@ class ResourceManager:
                 "placed": frames[1],
                 "ghost": frames[2]
             }
-
             self.load_piece(name, base_matrix, blocks)
 
 

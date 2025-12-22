@@ -4,7 +4,6 @@ from typing import Dict, Set, List, Tuple
 
 
 
-# (!) MODIFICAR LA PARTE DE CUANDO DEBE ESTAR EN NONE ALGUNA DE LAS DOS TECLAS DE UNA ACTION
 # (!) MODIFICAR DONDE SE UBICARÁ LA CARPETA (POSIBLE src/managers)
 # (!) AÑADIR METODOS PARA LA MODIFICACION DE TECLAS EN OPCIONES
 
@@ -37,6 +36,8 @@ class InputManager:
 
         self.load_key_mapping()
 
+
+    # (?) Ver defaultDics para facilitar busquedas
     def update(self, events: List[pygame.event.Event]) -> None:
             """Actualiza los estados de las acciones según los eventos del frame."""
             self._pressed.clear()
@@ -66,6 +67,7 @@ class InputManager:
         return (context, action) in self._released
 
     def get_keys_for_action(self, context: str, action: str) -> List[int]:
+        self._assert_action(context,action)
         return list(self.key_map.get(context, {}).get(action, set()))
     
     def load_key_mapping(self) -> None:
@@ -83,13 +85,13 @@ class InputManager:
                 if not isinstance(keys, list):
                     raise ValueError(f"Input Manager: Las teclas de '{action}' en '{context}' deben ser una Lista")
 
-                pygame_keys = [self._parse_pygame_key(key_name) for key_name in keys]
+                pygame_keys = [self._str_to_pygame_key(key_name) for key_name in keys]
 
                 if len(pygame_keys) > 2:
                     raise ValueError(f"Input Manager: La acción '{action}' en el contexto '{context}' no puede tener más de 2 teclas asignadas.")
 
                 # Asocia las teclas convertidas a la acción
-                self.bind_keys_to_action(context, action, pygame_keys)
+                self._bind_keys_to_action(context, action, pygame_keys)
 
     def save_key_mapping(self) -> None:
         """Guarda el mapeo de teclas en un archivo JSON sin recrear todo el diccionario."""
@@ -105,16 +107,14 @@ class InputManager:
                 json_data["controls"][context] = {}
             for action, keys in actions.items():
                 # Convertir las teclas de Pygame a nombres legibles
-                readable_keys = [self._reverse_parse_pygame_key(key) for key in keys]
+                readable_keys = [self._pygame_key_to_str(key) for key in keys]
                 json_data["controls"][context][action] = readable_keys
 
         json.save(self.config_path, json_data)
 
 
     # --- HELPERS ---
-
-
-    def bind_keys_to_action(self, context: str, action: str, keys: List[int]) -> None:
+    def _bind_keys_to_action(self, context: str, action: str, keys: List[int]) -> None:
         """Asocia múltiples teclas a una acción dentro de un contexto."""
         if context not in self.key_map:
             self.key_map[context] = {}
@@ -128,18 +128,36 @@ class InputManager:
 
 
     @staticmethod
-    def _parse_pygame_key(key_name: str) -> int:
+    def _str_to_pygame_key(key_name: str) -> int:
         """ Convierte una tecla string ("left", "space") a pygame.K_* """
-        attr = f"K_{key_name.lower()}"
+        attr = f"K_{key_name}"
         if not hasattr(pygame, attr):
             raise ValueError(f"Tecla inválida en configuración: '{key_name}'")
         return getattr(pygame, attr)
 
     @staticmethod
-    def _reverse_parse_pygame_key(pygame_key: int) -> str:
+    def _pygame_key_to_str(pygame_key: int) -> str:
         """Convierte una tecla pygame.K_* a string ("left", "space")."""
         try:
             return InputManager._pygame_key_to_name[pygame_key]
         except KeyError:
             raise ValueError(f"Tecla Pygame no válida: '{pygame_key}'")
+
+    def _assert_context(self, context: str) -> None:
+        if context not in self.key_map:
+            raise ValueError(
+                f"Input Manager: El contexto '{context}' no existe. "
+                f"Contextos disponibles: {list(self.key_map.keys())}"
+            )
         
+    def _assert_action(self, context: str, action: str) -> None:
+        self._assert_context(context)
+
+        if action not in self.key_map[context]:
+            raise ValueError(
+                f"InputManager: La acción '{action}' no existe en el contexto '{context}'. "
+                f"Acciones disponibles: {list(self.key_map[context].keys())}"
+            )
+
+    def __repr__(self):
+        return f"<InputManager key_map={self.key_map}>"

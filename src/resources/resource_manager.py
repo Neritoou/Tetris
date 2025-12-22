@@ -86,7 +86,8 @@ class ResourceManager:
 
     # --- MÉTODOS PRIVADOS DE CARGA ---
     def __load_images(self):
-        pass
+        # BOARD BASE
+        self.load_image("Board","assets/images/grid.png")
 
     def __load_fonts(self):
         pass

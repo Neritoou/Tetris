@@ -18,3 +18,5 @@ game = Game(metadata)
 
 if __name__ == "__main__":
     game.run_independently()
+
+    

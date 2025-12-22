@@ -1,12 +1,13 @@
 {
     "controls": {
         "play": {
-            "move_left": ["left", "a"],
-            "move_right": ["right", "d"]
+            "move_left": ["d", "a"],
+            "move_right": ["w", "d"]
         },
         "ui": {
-            "select": ["enter"],
-            "back": ["escape"]
+            "select": ["d"],
+            "back": ["w"]
         }
     }
 }
+

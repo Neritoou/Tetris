@@ -83,11 +83,7 @@ class InputManager:
                 if not isinstance(keys, list):
                     raise ValueError(f"Input Manager: Las teclas de '{action}' en '{context}' deben ser una Lista")
 
-                # Convertir todas las teclas de la lista
-                try:
-                    pygame_keys = [self._parse_pygame_key(key_name) for key_name in keys]
-                except ValueError as e:
-                    raise ValueError(f"Input Manager: Error en la tecla de la acción '{action}' del contexto '{context}'.") from e
+                pygame_keys = [self._parse_pygame_key(key_name) for key_name in keys]
 
                 if len(pygame_keys) > 2:
                     raise ValueError(f"Input Manager: La acción '{action}' en el contexto '{context}' no puede tener más de 2 teclas asignadas.")
@@ -134,7 +130,7 @@ class InputManager:
     @staticmethod
     def _parse_pygame_key(key_name: str) -> int:
         """ Convierte una tecla string ("left", "space") a pygame.K_* """
-        attr = f"K_{key_name.upper()}"
+        attr = f"K_{key_name.lower()}"
         if not hasattr(pygame, attr):
             raise ValueError(f"Tecla inválida en configuración: '{key_name}'")
         return getattr(pygame, attr)
@@ -146,3 +142,4 @@ class InputManager:
             return InputManager._pygame_key_to_name[pygame_key]
         except KeyError:
             raise ValueError(f"Tecla Pygame no válida: '{pygame_key}'")
+        

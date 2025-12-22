@@ -1,7 +1,7 @@
 import pygame
 import numpy as np
 from typing import Dict, List
-from util import PieceData, PieceSurfaces
+from ..util import PieceData, PieceSurfaces
 
 class PieceLibrary:
     """
@@ -69,7 +69,7 @@ class PieceLibrary:
         """Genera las cuatro rotaciones (0°, 90°, 180°, 270°) de la matriz."""
         rotations = [matrix]
         for _ in range(3):
-            matrix = np.rot90(matrix)
+            matrix = np.rot90(matrix, k= -1)
             rotations.append(matrix)
         return rotations
 

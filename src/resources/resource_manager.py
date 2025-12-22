@@ -96,7 +96,7 @@ class ResourceManager:
 
     def __load_spritesheets(self):
         # BLOQUES PARA LAS PIEZAS
-        self.load_spritesheet("BlocksType", "assets/tetronomo2.png", (BLOCK_W,BLOCK_H), (BLOCK_PW,BLOCK_PH))
+        self.load_spritesheet("BlocksType", "assets/spritesheets/tetromino.png", (BLOCK_W,BLOCK_H), (BLOCK_PW,BLOCK_PH))
     
     def __load_pieces(self):
         """Registra las piezas del Tetris usando la constante PIECE_DEFINITIONS."""

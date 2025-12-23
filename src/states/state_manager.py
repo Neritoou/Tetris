@@ -1,35 +1,50 @@
-from .game_state import GameState
 from ..util import OverlayType
+from typing import TYPE_CHECKING
 import pygame
+
+if TYPE_CHECKING:
+    from game import Game
+    from .game_state import GameState
+
+
 
 class StateManager:
     """
     Gestiona una pila de estados de juego (stack) con soporte para overlays y estados transitorios.
     """
 
-    def __init__(self):
-        self.stack: list[GameState] = []
+    def __init__(self,game: "Game"):
+        self.stack: "list[GameState]" = []
+        self.game = game
 
     @property
-    def current(self) -> GameState:
+    def current(self) -> "GameState":
         """Devuelve el estado superior"""
-        return self.stack[-1] 
+        if self.stack:
+            return self.stack[-1] 
     
-    def push(self, state: GameState) -> None:
+    def change(self, state_class: "type[GameState]", game: "Game"):
         """
-        Agrega un estado al stack y llama a on_enter.
-        Si el estado es un overlay, no elimina el estado anterior.
+        Reemplaza el estado actual por uno nuevo.
+
+        - Si el nuevo estado NO es un overlay, el estado superior actual es eliminado
+        - Si el nuevo estado ES un overlay, se apila sobre el estado actual sin eliminarlo.
         """
-        if state.overlay_type == OverlayType.NONE and self.stack:
-            self.current.on_exit()
+        if isinstance(self.current, state_class):
+            raise ValueError(f"State Manager: El estado {state_class.__name__} ya está activo.")
+        
+        new_state = state_class(game)
+        if new_state.overlay_type == OverlayType.NONE and self.stack:
+            self._pop()
+        self._push(new_state)
+
+    def _push(self, state: "GameState") -> None:
+        """ Agrega un estado al stack y llama a on_enter. """
         self.stack.append(state)
         state.on_enter()
 
-    def pop(self) -> None:
-        """
-        Elimina el estado superior y llama a on_exit.
-        Si el estado superior es un overlay, solo se elimina el overlay y se mantiene el estado anterior.
-        """
+    def _pop(self) -> None:
+        """ Elimina el estado superior y llama a on_exit. """
         if self.stack:
             self.current.on_exit()
             self.stack.pop()
@@ -70,5 +85,5 @@ class StateManager:
 
     def clear(self) -> None:
         while self.stack:
-            self.pop()
+            self._pop()
 

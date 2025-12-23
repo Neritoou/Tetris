@@ -1,8 +1,10 @@
 from abc import ABC, abstractmethod
-import pygame
-from typing import List
-from game import Game
-from ..util import OverlayType
+from typing import List, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from game import Game
+    from ..util import OverlayType
+    import pygame
 
 class GameState(ABC):
     """
@@ -10,7 +12,7 @@ class GameState(ABC):
     Los estados como 'MainMenu', 'Playing', 'Paused', 'GameOver', etc. deben heredar de esta clase.
     """
 
-    def __init__(self, game: Game) -> None:
+    def __init__(self, game: "Game") -> None:
         """
         Inicializa el estado del juego con una referencia al objeto Game.
 
@@ -36,7 +38,7 @@ class GameState(ABC):
         pass
 
     @abstractmethod
-    def handle_input(self, events: List[pygame.event.Event]) -> None:
+    def handle_input(self, events: "List[pygame.event.Event]") -> None:
         """
         Método para manejar la entrada del usuario. 
         Los eventos de teclas, ratón, etc., deben ser procesados aquí.
@@ -58,7 +60,7 @@ class GameState(ABC):
         pass
 
     @abstractmethod
-    def render(self, surface: pygame.Surface) -> None:
+    def render(self, surface: "pygame.Surface") -> None:
         """
         Método para dibujar en la pantalla. 
         Los estados del juego deben dibujar los elementos en la pantalla en este método.
@@ -70,7 +72,7 @@ class GameState(ABC):
 
     @property
     @abstractmethod
-    def overlay_type(self) -> OverlayType:
+    def overlay_type(self) -> "OverlayType":
         """
         Tipo de overlay del estado.
         - NONE: estado normal

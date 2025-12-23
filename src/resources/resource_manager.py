@@ -1,9 +1,12 @@
 import pygame
 import numpy as np
-from typing import Dict, Tuple, TypeVar
+from typing import Dict, Tuple, TypeVar, TYPE_CHECKING
 from .spritesheet import SpriteSheet
-from .piece_library import PieceLibrary, PieceData, PieceSurfaces
+from .piece_library import PieceLibrary
 from ..constants import PIECE_DEFINITIONS, BLOCK_W, BLOCK_H, BLOCK_PW, BLOCK_PH
+
+if TYPE_CHECKING:
+    from .piece_library import PieceData, PieceSurfaces
 
 T = TypeVar("T")
 K = TypeVar("K")
@@ -46,7 +49,7 @@ class ResourceManager:
         image = pygame.image.load(path).convert_alpha()
         self.spritesheets[key] = SpriteSheet(image,frame_size,padding)
 
-    def load_piece(self, key: str, base_matrix: np.ndarray, blocks: PieceSurfaces) -> None:
+    def load_piece(self, key: str, base_matrix: np.ndarray, blocks: "PieceSurfaces") -> None:
         """Registra una pieza en la biblioteca interna."""
         self.piece_library.register_piece(key, base_matrix,blocks)
 
@@ -68,7 +71,7 @@ class ResourceManager:
         """Obtiene un spritesheet cargado."""
         return self._get_resource(self.spritesheets, key, "SpriteSheet")
     
-    def get_piece(self, key: str) -> PieceData:
+    def get_piece(self, key: str) -> "PieceData":
         """Obtiene una pieza registrada en la biblioteca."""
         return self.piece_library.get_piece(key)
     # (?) MEJORAR ESTO
@@ -85,21 +88,21 @@ class ResourceManager:
         self.__load_pieces()
 
     # --- MÉTODOS PRIVADOS DE CARGA ---
-    def __load_images(self):
+    def __load_images(self) -> None:
         # BOARD BASE
         self.load_image("Board","assets/images/grid.png")
 
-    def __load_fonts(self):
+    def __load_fonts(self) -> None:
         pass
 
-    def __load_sounds(self):
+    def __load_sounds(self) -> None:
         pass
 
-    def __load_spritesheets(self):
+    def __load_spritesheets(self) -> None:
         # BLOQUES PARA LAS PIEZAS
         self.load_spritesheet("BlocksType", "assets/spritesheets/tetromino.png", (BLOCK_W,BLOCK_H), (BLOCK_PW,BLOCK_PH))
     
-    def __load_pieces(self):
+    def __load_pieces(self) -> None:
         """Registra las piezas del Tetris usando la constante PIECE_DEFINITIONS."""
         sheet = self.get_spritesheet("BlocksType") 
 

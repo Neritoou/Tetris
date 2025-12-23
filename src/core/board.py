@@ -1,29 +1,22 @@
 import pygame
 import numpy as np
-from constants import tetris_values
 from piece import Piece
 
-FALL_INTERVAL = 0.3
-fall_timer = 0
-
 class Board:
-    def __init__(self, rows: int, cols: int, cell_w: int, cell_h: int) -> None:
+    def __init__(self, rows: int, cols: int, cell_w: int, cell_h: int, block_surface: pygame.Surface) -> None:
         self.rows = rows
         self.cols = cols
         self.cell_width = cell_w
         self.cell_height = cell_h
 
         self.grid: np.ndarray = np.zeros((self.rows, self.cols), dtype=int)
-        
+        self.block_surface = block_surface
+
         self.active_piece: Piece | None = None
-        self.next_piece: Piece | None = None
-        self.hold_piece: Piece | None = None
 
     def spawn_piece(self, piece: Piece):
-        self.active_piece = piece
-
-    def try_rotate(self):
-        pass
+        self.active_piece = piece        
+        piece.center_piece(self.cols)
 
     def lock_piece(self):
         if not self.active_piece:
@@ -32,7 +25,7 @@ class Board:
         for r, c in self.active_piece.get_cells():
             self.grid[r, c] = 1
         self.active_piece.state = "placed"
-        self.active_piece = self.next_piece
+        self.active_piece = None
 
     def is_valid(self, piece: Piece, row: int | None = None, col: int | None = None) -> bool:
         for r, c in piece.get_cells(row, col):
@@ -56,42 +49,38 @@ class Board:
             return True
         return False
     
-    def clear_lines(self):
-        pass
-
-    def draw(self, surface: pygame.Surface):
-        pass
-    
-    """
-    def try_fall_piece(rect: pygame.Rect, h, dt):
-        global fall_timer
-        global row_piece
-        fall_timer += dt
-        if fall_timer >= FALL_INTERVAL:
-            fall_timer = 0
+    def try_fall_piece(self) -> bool:
+        if not self.active_piece:
+            return False
+        
+        if self.try_move(1, 0):
             return True
+        self.lock_piece()
         return False
 
-    def try_move(dx, dy):
-        global col_piece, row_piece
-        new_col = col_piece + dx
-        new_row = row_piece + dy
+    def draw(self, surface: pygame.Surface):
+        for r, c in np.ndenumerate(self.grid):
+            if self.grid[r][c]:
+                x = c * self.cell_width
+                y = r * self.cell_height
+                surface.blit(self.block_surface, (x, y))
+        
+        if self.active_piece:
+            self.active_piece.draw(surface)
+        
 
-        if valid_move(PIECES["S"], GRID_MATRIZ, new_row, new_col):
-            col_piece = new_col
-            row_piece = new_row
-
-    def get_coords_of_piece_in_grid(piece, row, col):
-        return ((GRID_X + col * CELL_W), GRID_Y + row * CELL_H)
-
+    def is_game_over(self) -> bool:
+        if not self.active_piece:
+            return False
+        if self.is_valid(self.active_piece):
+            return False
+        return True
     
-    def get_piece_matrix(self, name: str, rotation: int = 0) -> np.ndarray:
-        if not self.piece_manager:
-            raise RuntimeError("PieceManager no cargado")
-        return self.piece_manager.get_matrix(name, rotation)
+    def clear_lines(self):
+        pass
+        # (!) falta implementar la logica, sin esto no se eliminan las lineas y haria game over mas rapido
 
-    def get_piece_surface(self, name: str, rotation: int = 0) -> pygame.Surface:
-        if not self.piece_manager:
-            raise RuntimeError("PieceManager no cargado")
-        return self.piece_manager.get_surface(name, rotation)
-    """
+    def try_rotate(self):
+        if not self.active_piece:
+            return False
+        # (!) falta implementar logica porque quiero intentar los wall kicks, pero para eso necesito ir probando que funcione

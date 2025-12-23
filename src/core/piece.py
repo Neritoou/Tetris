@@ -4,7 +4,7 @@ from constants import BLOCK_H, BLOCK_W
 from util import PieceData
 
 class Piece:
-    def __init__(self, name: str, row: int, col: int, data: PieceData, rot: int = 0, state: str = "normal"):
+    def __init__(self, name: str, row: int, col: int, data: PieceData, rot: int = 0, state: str = "normal") -> None:
         """
         Inicializa una pieza activa del juego.
 
@@ -80,3 +80,8 @@ class Piece:
                 if matrix[r][c]:
                     cells.append((base_row + r, base_col + c))
         return cells
+    
+    def center_piece(self, board_cols: int):
+        """Centra las piezas en la board."""
+        matrix_width = self.matrix.shape[1]
+        self.col = (board_cols - matrix_width) // 2

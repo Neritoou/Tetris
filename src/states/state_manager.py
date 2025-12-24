@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING, Optional
 import pygame
 
 if TYPE_CHECKING:
-    from game import Game
+    from src.core.game import Game
     from .game_state import GameState
 
 

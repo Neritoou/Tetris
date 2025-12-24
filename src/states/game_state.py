@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import List, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from game import Game
+    from src.core.game import Game
     from ..util import OverlayType
     import pygame
 

@@ -45,15 +45,15 @@ class InputManager:
         """Verifica si una tecla ha sido liberada para una acción en un contexto específico."""
         return self._key.is_released(context, action)
 
-    def is_mouse_pressed(self, button: int) -> bool:
+    def is_mouse_pressed(self, button: str) -> bool:
         """Verifica si un botón del mouse está presionado."""
-        return self._mouse.is__pressed(button)
+        return self._mouse.is_pressed(button)
 
-    def is_mouse_held(self, button: int) -> bool:
+    def is_mouse_held(self, button: str) -> bool:
         """Verifica si un botón del mouse está siendo mantenido."""
         return self._mouse.is_held(button)
 
-    def is_mouse_released(self, button: int) -> bool:
+    def is_mouse_released(self, button: str) -> bool:
         """Verifica si un botón del mouse ha sido liberado."""
         return self._mouse.is_released(button)
 

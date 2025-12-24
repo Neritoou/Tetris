@@ -5,7 +5,7 @@ from .game_state import GameState
 
 
 if TYPE_CHECKING:
-    from game import Game
+    from src.core.game import Game
 
 
 
@@ -20,10 +20,10 @@ class PlayState(GameState):
         return
     
     def handle_input(self, events: List[pygame.event.Event]) -> None:
-        if self.game.input_manager.is_key_released("play","move_left"):
+        if self.game.input.is_mouse_released("left"):
             print("ESTAS PRESIONANDO MOVE_LEFT")
             print("------------------")
-        if self.game.input_manager.is_key_held("play","move_right"):
+        if self.game.input.is_key_held("play","move_right"):
             print("ESTAS HOLDEANDO LA W")
             print("-------------------")
         return 

@@ -7,7 +7,6 @@ from src.states import StateManager, PlayState
 class Game(GameBase):
     def __init__(self, metadata: GameMeta) -> None:
         super().__init__(metadata)
-
         self.resource_manager = ResourceManager()
         self.input_manager = InputManager("config/controls.json")
         self.state_manager = StateManager(self)

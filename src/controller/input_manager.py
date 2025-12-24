@@ -26,50 +26,103 @@ class InputManager:
         # Mapeo: context -> action -> set de teclas (pygame.K_*)
         self.key_map: Dict[str, Dict[str, Set[int]]] = {}
 
-        # Estados de acciones presionadas, mantenidas y liberadas
-        self._pressed: Set[Tuple[str, str]] = set()
-        self._held: Set[Tuple[str, str]] = set()
-        self._released: Set[Tuple[str, str]] = set()
+        # Estados de teclas
+        self._key_pressed: Set[Tuple[str, str]] = set()
+        self._key_held: Set[Tuple[str, str]] = set()
+        self._key_released: Set[Tuple[str, str]] = set()
+
+        # Estados de botones del mouse
+        self._mouse_pressed: Set[int] = set() 
+        self._mouse_held: Set[int] = set()  
+        self._mouse_released: Set[int] = set()  
 
         # Mapeo inverso: tecla pygame -> lista de (context, action)
         self._key_to_actions: Dict[int, List[Tuple[str, str]]] = {}
 
         self.load_key_mapping()
 
+    # --- 
+    def is_key_pressed(self, context: str, action: str) -> bool:
+        """Verifica si la acción está presionada en el contexto."""
+        self._assert_action(context, action)
+        return (context, action) in self._key_pressed
 
-    # (?) Ver defaultDics para facilitar busquedas
-    def update(self, events: List[pygame.event.Event]) -> None:
-            """Actualiza los estados de las acciones según los eventos del frame."""
-            self._pressed.clear()
-            self._released.clear()
+    def is_key_held(self, context: str, action: str) -> bool:
+        """Verifica si la acción está mantenida en el contexto."""
+        self._assert_action(context, action)
+        return (context, action) in self._key_held
 
-            for event in events:
-                if event.type in (pygame.KEYDOWN, pygame.KEYUP):
-                    key = event.key
-                    actions = self._key_to_actions.get(key, [])
-                    for context, action in actions:
-                        identifier = (context, action)
-                        if event.type == pygame.KEYDOWN:
-                            if identifier not in self._held:
-                                self._pressed.add(identifier)
-                            self._held.add(identifier)
-                        else:  # KEYUP
-                            self._released.add(identifier)
-                            self._held.discard(identifier)
-
-    def is_pressed(self, context: str, action: str) -> bool:
-        return (context, action) in self._pressed
-
-    def is_held(self, context: str, action: str) -> bool:
-        return (context, action) in self._held
-
-    def is_released(self, context: str, action: str) -> bool:
-        return (context, action) in self._released
-
-    def get_keys_for_action(self, context: str, action: str) -> List[int]:
-        self._assert_action(context,action)
-        return list(self.key_map.get(context, {}).get(action, set()))
+    def is_key_released(self, context: str, action: str) -> bool:
+        """Verifica si la acción ha sido liberada en el contexto."""
+        self._assert_action(context, action)
+        return (context, action) in self._key_released
     
+    def is_mouse_pressed(self, button: int) -> bool:
+        """Verifica si el botón del mouse está presionado."""
+        return button in self._mouse_pressed
+
+    def is_mouse_held(self, button: int) -> bool:
+        """Verifica si el botón del mouse está mantenido."""
+        return button in self._mouse_held
+
+    def is_mouse_released(self, button: int) -> bool:
+        """Verifica si el botón del mouse ha sido liberado."""
+        return button in self._mouse_released
+
+    def get_mouse_pos(self) -> Tuple[int, int]:
+        """Obtiene la posición actual del mouse."""
+        return pygame.mouse.get_pos()   
+    
+    # --- DETECCIÓN DE INPUT ---
+    def update(self, events: List[pygame.event.Event]) -> None:
+        """Actualiza los estados de las acciones según los eventos del frame."""
+        # Limpiar estados previos
+        self._key_pressed.clear()
+        self._key_released.clear()
+        self._mouse_released.clear()
+
+        for event in events:
+            if event.type in (pygame.KEYDOWN, pygame.KEYUP):
+                self._handle_key_event(event)
+            elif event.type in (pygame.MOUSEBUTTONDOWN, pygame.MOUSEBUTTONUP):
+                self._handle_mouse_event(event)
+
+    # Detectar input del Teclado
+    def _handle_key_event(self, event: pygame.event.Event) -> None:
+        """Maneja los eventos de teclas (KEYDOWN, KEYUP)."""
+        key = event.key
+        # Se obtienen todas las acciones relacionadas a la key
+        actions = self._key_to_actions.get(key, [])
+                
+        for context, action in actions:
+            identifier = (context, action)
+
+            if event.type == pygame.KEYDOWN:
+                # Si es la primera vez que se presiona, añadir a _pressed
+                if identifier not in self._key_held:
+                    self._key_pressed.add(identifier)  
+                self._key_held.add(identifier) # Siempre se marca como "held"
+                    
+            elif event.type == pygame.KEYUP:
+                self._key_released.add(identifier)  # Marcar como liberado
+                self._key_held.discard(identifier)  # Eliminar de los mantenidos   
+
+    # Detectar input del Mouse
+    def _handle_mouse_event(self, event: pygame.event.Event) -> None:
+        """Maneja los eventos de mouse (MOUSEBUTTONDOWN, MOUSEBUTTONUP)."""
+        button = event.button
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            # Si es la primera vez que se presiona, añadir a _pressed
+            if button not in self._mouse_held:
+                self._mouse_pressed.add(button)
+            self._mouse_held.add(button) # Siempre se marca como "held"
+
+        elif event.type == pygame.MOUSEBUTTONUP:
+            self._mouse_released.add(button) # Marcar como liberado
+            self._mouse_held.discard(button) # Eliminar de los mantenidos 
+
+    
+    # --- CARGA Y ACTUAALIZACIÓN DEL JSON ---
     def load_key_mapping(self) -> None:
         """Carga el mapeo de teclas desde un archivo JSON."""
         data = json.load(self.config_path)
@@ -114,18 +167,23 @@ class InputManager:
 
 
     # --- HELPERS ---
+    def get_keys_for_action(self, context: str, action: str) -> List[int]:
+        self._assert_action(context,action)
+        return list(self.key_map.get(context, {}).get(action, set()))
+    
     def _bind_keys_to_action(self, context: str, action: str, keys: List[int]) -> None:
         """Asocia múltiples teclas a una acción dentro de un contexto."""
-        if context not in self.key_map:
-            self.key_map[context] = {}
-
-        # Agregar las teclas a la acción correspondiente
-        if action not in self.key_map[context]:
-            self.key_map[context][action] = set()
-        
-        # Añadir teclas al conjunto de teclas de la acción
+        # key_map 
+        self.key_map.setdefault(context, {})
+        self.key_map[context].setdefault(action, set())
         self.key_map[context][action].update(keys)
 
+        # key_to_actions (mapa inverso) 
+        for key in keys:
+            self._key_to_actions.setdefault(key, [])
+            pair = (context, action)
+            if pair not in self._key_to_actions[key]:
+                self._key_to_actions[key].append(pair)
 
     @staticmethod
     def _str_to_pygame_key(key_name: str) -> int:

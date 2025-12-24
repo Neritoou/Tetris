@@ -20,6 +20,12 @@ class PlayState(GameState):
         return
     
     def handle_input(self, events: List[pygame.event.Event]) -> None:
+        if self.game.input_manager.is_key_released("play","move_left"):
+            print("ESTAS PRESIONANDO MOVE_LEFT")
+            print("------------------")
+        if self.game.input_manager.is_key_held("play","move_right"):
+            print("ESTAS HOLDEANDO LA W")
+            print("-------------------")
         return 
     
     def render(self, surface: pygame.Surface) -> None:

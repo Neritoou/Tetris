@@ -14,7 +14,7 @@ class StateManager:
     """
 
     def __init__(self,game: "Game"):
-        self.stack: "list[GameState]" = []
+        self.stack: list["GameState"] = []
         self.game = game
 
     @property

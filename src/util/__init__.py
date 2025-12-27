@@ -1,10 +1,11 @@
-from .typed_class import PieceData, PieceSurfaces, OverlayType
-from .imports import pygame, np
+from .typed_class import PieceData, PieceSurfaces, OverlayType, MouseButton
+from .conversors import str_to_pygame_key, pygame_key_to_str
 
 __all__ = [
     "PieceData",
     "PieceSurfaces",
     "OverlayType",
-    "pygame",
-    "np"
+    "str_to_pygame_key",
+    "pygame_key_to_str",
+    "MouseButton"
 ]

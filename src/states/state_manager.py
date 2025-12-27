@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING, Optional
 import pygame
 
 if TYPE_CHECKING:
-    from game import Game
+    from src.core.game import Game
     from .game_state import GameState
 
 
@@ -14,7 +14,7 @@ class StateManager:
     """
 
     def __init__(self,game: "Game"):
-        self.stack: "list[GameState]" = []
+        self.stack: list["GameState"] = []
         self.game = game
 
     @property

@@ -10,8 +10,15 @@ class Game(GameBase):
         self.resource_manager: ResourceManager = ResourceManager()
         self.input: InputManager = InputManager("config/controls.json")
         self.state: StateManager = StateManager(self)
-        # Estado inicial
-        self.state.change(PlayState, self)
+ 
+
+
+    def start(self, surface: pygame.Surface):
+        super().start(surface)
+        # Cargar Recursos 
+        self.resource_manager.load_resources()
+        # Estado inicial       
+        self.state.change(PlayState)
 
     def handle_events(self, events: list[pygame.event.Event]) -> None:
         self.input.update(events)
@@ -23,4 +30,3 @@ class Game(GameBase):
     def render(self) -> None:
         self.surface.fill((0, 0, 0))
         self.state.render(self.surface)
-

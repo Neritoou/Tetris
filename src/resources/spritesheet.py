@@ -14,8 +14,9 @@ class SpriteSheet:
         self._fw: int = frame_size[0]
         self._fh: int = frame_size[1]
 
-        self._cols: int = self._w // self._fw
-        self._rows: int = self._h // self._fh
+        self._cols = self._w // (self._fw + 2 * self._padding_w)
+        self._rows = self._h // (self._fh + 2 * self._padding_h)
+
     
     def get_frame_at(self, row: int, col: int) -> pygame.Surface:
         self._assert_valid_row(row)

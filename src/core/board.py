@@ -1,17 +1,24 @@
 import pygame
 import numpy as np
-from piece import Piece
+from .piece import Piece
+from ..constants.tetris_values import ROWS, COLS, BLOCK_H, BLOCK_W
 
 class Board:
-    def __init__(self, rows: int, cols: int, cell_w: int, cell_h: int, block_surface: pygame.Surface) -> None:
-        self.rows = rows
-        self.cols = cols
-        self.cell_width = cell_w
-        self.cell_height = cell_h
+    def __init__(self, grid_surface: pygame.Surface, block_surface: pygame.Surface) -> None:
+        self.rows = ROWS
+        self.cols = COLS
 
         self.grid: np.ndarray = np.zeros((self.rows, self.cols), dtype=int)
-        self.block_surface = block_surface
+        self.grid_surface = grid_surface
 
+        self.width = self.grid_surface.get_width()
+        self.height = self.grid_surface.get_height()
+        self.x = 0
+        self.y = 0
+
+        self.cell_width: int = BLOCK_W
+        self.cell_height: int = BLOCK_H
+        self.block_surface = block_surface
         self.active_piece: Piece | None = None
 
     def spawn_piece(self, piece: Piece):
@@ -59,11 +66,14 @@ class Board:
         return False
 
     def draw(self, surface: pygame.Surface):
-        for r, c in np.ndenumerate(self.grid):
-            if self.grid[r][c]:
-                x = c * self.cell_width
-                y = r * self.cell_height
-                surface.blit(self.block_surface, (x, y))
+        surface.blit(self.grid_surface, (0, 0))
+
+        for r in range(self.rows):
+            for c in range(self.cols):
+                if self.grid[r][c] > 0:
+                    x: int = c * self.cell_width
+                    y: int = r * self.cell_height
+                    surface.blit(self.block_surface, (x, y))
         
         if self.active_piece:
             self.active_piece.draw(surface)

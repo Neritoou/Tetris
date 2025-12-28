@@ -1,4 +1,3 @@
-
 from typing import Dict, Set, List, Tuple
 
 class KeyMapConfig:

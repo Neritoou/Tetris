@@ -3,7 +3,7 @@ from typing import List, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from src.core.game import Game
-    from ..util import OverlayType
+    from ..core import OverlayType
     import pygame
 
 class GameState(ABC):

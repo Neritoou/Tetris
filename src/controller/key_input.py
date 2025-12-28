@@ -59,3 +59,4 @@ class KeyInputManager:
             elif event.type == pygame.KEYUP:
                 self._released.add(identifier)  # Marcar como liberado
                 self._held.discard(identifier)  # Eliminar de los mantenidos   
+                

@@ -1,6 +1,21 @@
 import pygame
-from typing import Set, Tuple, TYPE_CHECKING
-from ..util.typed_class import MouseButton
+from typing import Set, Tuple
+from enum import Enum
+
+class MouseButton(Enum):
+    LEFT = pygame.BUTTON_LEFT
+    MIDDLE = pygame.BUTTON_MIDDLE
+    RIGHT = pygame.BUTTON_RIGHT
+    SCROLL_UP = pygame.BUTTON_WHEELUP
+    SCROLL_DOWN = pygame.BUTTON_WHEELDOWN
+
+    @classmethod
+    def from_name(cls, name: str) -> "MouseButton":
+        """Convierte el nombre de un botón en el correspondiente enum de MouseButton."""
+        try:
+            return cls[name.upper()]
+        except KeyError:
+            raise ValueError(f"input Manager: botón del mouse inválido: '{name}'")
 
 class MouseInputManager:
     """Manejo de entradas del mouse."""
@@ -84,3 +99,4 @@ class MouseInputManager:
         elif event.type == pygame.MOUSEBUTTONUP:
             self._released.add(button) # Marcar como liberado
             self._held.discard(button) # Eliminar de los mantenidos 
+

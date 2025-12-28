@@ -6,7 +6,7 @@ from .spritesheet import SpriteSheet
 
 class ImageResource(TypedDict):
     path: str
-    surface: Surface
+    surface: Surface 
 
 class FontResource(TypedDict):
     path: str
@@ -19,3 +19,6 @@ class SpriteSheetResource(TypedDict):
 class SoundResource(TypedDict):
     path: str
     sound: Sound
+
+
+

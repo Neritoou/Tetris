@@ -1,5 +1,4 @@
 import pygame
-from collections.abc import Mapping
 from typing import Dict, Tuple, TypeVar, TYPE_CHECKING
 from .spritesheet import SpriteSheet
 from .piece_library import PieceLibrary
@@ -26,67 +25,6 @@ class ResourceManager:
         self._piece_library: PieceLibrary = PieceLibrary()
 
         self._loaded_paths: Dict[str, str] = {}
-        # (?) MEJORAR ESTO
-
-
-
-    # --- LOADERS ---
-    def load_image(self, key: str, path: str) -> None:
-        """Carga y almacena una imagen."""
-        # Si el recurso ya existe, no se crea nuevamente
-        if key in self._images:
-            if self._images[key]["path"] == path:
-                return
-            raise ValueError(f"Resource Manager: Image '{key}' ya tiene asociado un path distinto: '{self._images[key]['path']}'")
-        
-        self._assert_path_unused(path)
-        img = pygame.image.load(path)
-        self._images[key] = {"path": path, "surface": img.convert_alpha() if img.get_alpha() else img.convert()}
-        self._loaded_paths[path] = key
-
-        
-    def load_sound(self, key: str, path: str) -> None:
-        """Carga y almacena un sonido."""
-        # Si el recurso ya existe, no se crea nuevamente
-        if key in self._sounds:
-            if self._sounds[key]["path"] == path:
-                return
-            raise ValueError(f"Resource Manager: Sound '{key}' ya tiene asociado un path distinto: '{self._sounds[key]['path']}'")
-        
-        self._assert_path_unused(path)
-        self._sounds[key] = {"path": path, "sound": pygame.mixer.Sound(path)}
-        self._loaded_paths[path] = key
-
-
-    def load_font(self, key: str, path: str, size: int) -> None:
-        """Carga y almacena una fuente."""
-        # Si el recurso ya existe, no se crea nuevamente
-        if key in self._fonts:
-            if self._fonts[key]["path"] == path:
-                return
-            raise ValueError(f"Resource Manager: Font '{key}' ya tiene asociado un path distinto: '{self._fonts[key]['path']}'")
-        
-        self._assert_path_unused(path)   
-        self._fonts[(key,size)] = {"path": path, "font": pygame.font.Font(path, size)}
-        self._loaded_paths[path] = key
-
-    def load_spritesheet(self, key: str, path: str, frame_size: Tuple[int,int], padding: Tuple[int,int] = (0,0)) -> None:
-        """Carga un spritesheet desde disco."""
-        # Si el recurso ya existe, no se crea nuevamente
-        if key in self._spritesheets:
-            if self._spritesheets[key]["path"] == path:
-                return
-            raise ValueError(f"Resource Manager: SpriteSheet '{key}' ya tiene asociado un path distinto: '{self._spritesheets[key]['path']}'")
-        
-        self._assert_path_unused(path)
-        image = pygame.image.load(path).convert_alpha()
-        self._spritesheets[key] = {"path": path, "spritesheet": SpriteSheet(image,frame_size,padding)}
-        self._loaded_paths[path] = key
-
-
-    def load_piece(self, key: str, base_matrix: "np.ndarray", blocks: "PieceSurfaces") -> None:
-        """Registra una pieza en la biblioteca interna."""
-        self._piece_library.register_piece(key, base_matrix,blocks)
 
 
 
@@ -114,10 +52,98 @@ class ResourceManager:
     def get_piece(self, key: str) -> "PieceData":
         """Obtiene una pieza registrada en la biblioteca."""
         return self._piece_library.get_piece(key)
-    # (?) MEJORAR ESTO
 
 
 
+    # --- LOADERS ---
+    def load_image(self, key: str, path: str) -> None:
+        """Carga y almacena una imagen."""
+        # Si el recurso ya existe, no se crea nuevamente
+        if key in self._images:
+            if self._images[key]["path"] == path:
+                print(" YA SE CARGÓ")
+                return
+            raise ValueError(f"Resource Manager: Image '{key}' ya tiene asociado un path distinto: '{self._images[key]['path']}'")
+        
+        self._assert_path_unused(path)
+        img = pygame.image.load(path)
+        self._images[key] = {"path": path, "surface": img.convert_alpha() if img.get_alpha() else img.convert()}
+        self._loaded_paths[path] = key
+        
+    def load_sound(self, key: str, path: str) -> None:
+        """Carga y almacena un sonido."""
+        # Si el recurso ya existe, no se crea nuevamente
+        if key in self._sounds:
+            if self._sounds[key]["path"] == path:
+                return
+            raise ValueError(f"Resource Manager: Sound '{key}' ya tiene asociado un path distinto: '{self._sounds[key]['path']}'")
+        
+        self._assert_path_unused(path)
+        self._sounds[key] = {"path": path, "sound": pygame.mixer.Sound(path)}
+        self._loaded_paths[path] = key
+
+    def load_font(self, key: str, path: str, size: int) -> None:
+        """Carga y almacena una fuente."""
+        # Si el recurso ya existe, no se crea nuevamente
+        if key in self._fonts:
+            if self._fonts[key]["path"] == path:
+                return
+            raise ValueError(f"Resource Manager: Font '{key}' ya tiene asociado un path distinto: '{self._fonts[key]['path']}'")
+        
+        self._assert_path_unused(path)   
+        self._fonts[(key,size)] = {"path": path, "font": pygame.font.Font(path, size)}
+        self._loaded_paths[path] = key
+
+    def load_spritesheet(self, key: str, path: str, frame_size: Tuple[int,int], padding: Tuple[int,int] = (0,0)) -> None:
+        """Carga un spritesheet desde disco."""
+        # Si el recurso ya existe, no se crea nuevamente
+        if key in self._spritesheets:
+            if self._spritesheets[key]["path"] == path:
+                return
+            raise ValueError(f"Resource Manager: SpriteSheet '{key}' ya tiene asociado un path distinto: '{self._spritesheets[key]['path']}'")
+        
+        self._assert_path_unused(path)
+        image = pygame.image.load(path).convert_alpha()
+        self._spritesheets[key] = {"path": path, "spritesheet": SpriteSheet(image,frame_size,padding)}
+        self._loaded_paths[path] = key
+
+    def load_piece(self, key: str, base_matrix: "np.ndarray", blocks: "PieceSurfaces") -> None:
+        """Registra una pieza en la biblioteca interna."""
+        self._piece_library.register_piece(key, base_matrix,blocks)
+
+
+
+    # --- UNLOADERS ---
+    def unload_image(self, key) -> None:
+        """Elimina una imagen del Diccionario"""
+        if key not in self._images:
+            return
+        self._loaded_paths.pop(self._images[key]["path"], None)
+        self._images.pop(key)
+
+    def unload_sound(self, key) -> None:
+        """Elimina un sonido del Diccionario"""
+        if key not in self._sounds:
+            return
+        self._loaded_paths.pop(self._sounds[key]["path"], None)
+        self._sounds.pop(key)
+
+    def unload_font(self, key) -> None:
+        """Elimina una fuente del Diccionario"""
+        if key not in self._fonts:
+            return
+        self._loaded_paths.pop(self._fonts[key]["path"], None)
+        self._fonts.pop(key)
+
+    def unload_spritesheet(self, key) -> None:
+        """Elimina una imagen del Diccionario"""
+        if key not in self._spritesheets:
+            return
+        self._loaded_paths.pop(self._spritesheets[key]["path"], None)
+        self._spritesheets.pop(key)
+        
+
+   
     # --- CARGA GLOBAL DE RECURSOS ---
     def load(self):
         """Carga todos los recursos y piezas del juego."""
@@ -127,6 +153,9 @@ class ResourceManager:
         _load_sounds(self)
         _load_pieces(self)
 
+
+
+    # --- HELPERS ---
     def _get_resource(self, container: Dict[K, T], key: K, resource_type: str) -> T:
         """Obtiene un recurso de un diccionario, lanzando KeyError si no existe."""
         if key not in container:

@@ -1,6 +1,5 @@
 import pygame
-from arcade_machine_sdk import json
-from typing import Dict, Set, List, Tuple
+from typing import List, Tuple
 from .key_input import KeyInputManager
 from .mapping import KeyMappingManager
 from .mouse_input import MouseInputManager
@@ -60,10 +59,5 @@ class InputManager:
     def get_mouse_position(self) -> Tuple[int, int]:
         """Obtiene la posición del mouse."""
         return self._mouse.pos
- 
-
-
-
     
-
 

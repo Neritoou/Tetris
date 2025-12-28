@@ -1,12 +1,10 @@
-from ..util import OverlayType
-from typing import TYPE_CHECKING, Optional
+from ..core import OverlayType
+from typing import TYPE_CHECKING
 import pygame
 
 if TYPE_CHECKING:
     from src.core.game import Game
     from .game_state import GameState
-
-
 
 class StateManager:
     """
@@ -25,7 +23,7 @@ class StateManager:
             raise ValueError("State Manager: No hay estados en la pila.")
         return self.stack[-1] 
     
-    def change(self, state_class: type["GameState"], game: "Game"):
+    def change(self, state_class: type["GameState"]):
         """
         Reemplaza el estado actual por uno nuevo.
 
@@ -35,7 +33,7 @@ class StateManager:
         if self.stack and isinstance(self.current, state_class):
             raise ValueError(f"State Manager: El estado {state_class.__name__} ya está activo.")
         
-        new_state = state_class(game)
+        new_state = state_class(self.game)
         if new_state.overlay_type == OverlayType.NONE and self.stack:
             self._pop()
         self._push(new_state)
@@ -88,4 +86,3 @@ class StateManager:
     def clear(self) -> None:
         while self.stack:
             self._pop()
-

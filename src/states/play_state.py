@@ -1,6 +1,6 @@
 import pygame
 from typing import List, TYPE_CHECKING
-from ..util import OverlayType
+from ..core import OverlayType
 from .game_state import GameState
 
 

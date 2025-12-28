@@ -1,7 +1,7 @@
 import pygame
 import numpy as np
 from typing import Dict, List
-from ..util import PieceData, PieceSurfaces
+from ..core import PieceData, PieceSurfaces
 
 class PieceLibrary:
     """

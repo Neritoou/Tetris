@@ -1,27 +1,28 @@
 import pygame
 import numpy as np
-from constants import BLOCK_H, BLOCK_W
-from util import PieceData
+from typing import List, Tuple
+from ..constants import BLOCK_H, BLOCK_W
+from .types import PieceData
 
 class Piece:
-    def __init__(self, name: str, row: int, col: int, data: PieceData, rot: int = 0, state: str = "normal") -> None:
+    def __init__(self, name: str, data: PieceData, row: int = 0, col: int = 0, rot: int = 0, state: str = "normal") -> None:
         """
         Inicializa una pieza activa del juego.
 
         Args:
             name (str): Identificador de la pieza ('O', 'T', 'J'...).
+            data (PieceData): Datos estáticos de la pieza (matrices y superficies).
             row (int): Fila inicial de la pieza en el tablero.
             col (int): Columna inicial de la pieza en el tablero.
             rot (int): Indice de la rotación actual.
-            data (PieceData): Datos estáticos de la pieza (matrices y superficies).
             state (str): Estado visual de la pieza (normal, placed, ghost).
         """
 
         self.name = name
+        self.data = data
         self.row = row
         self.col = col
         self.rot = rot
-        self.data = data
         self.state = state
 
     @property
@@ -65,7 +66,7 @@ class Piece:
         y = self.row * BLOCK_H
         surface.blit(self.image, (x, y))
 
-    def get_cells(self, row: int | None = None, col: int | None = None) -> list[tuple[int, int]]:
+    def get_cells(self, row: int | None = None, col: int | None = None) -> List[Tuple[int, int]]:
         """Calcula las coordenadas absolutas de las celdas ocupadas por la pieza."""
 
         base_row = self.row if row is None else row

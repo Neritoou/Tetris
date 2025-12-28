@@ -14,18 +14,11 @@ BLOCK_PADDING = (4,4)
 BLOCK_PW = 4
 BLOCK_PH = 4
 
-# Gameplay
-SPAWN_ROW = 0
-SPAWN_COL = COLS // 2
-GRAVITY_DELAY = 0.3
-LOCK_DELAY = 0.5
-
 # Piece definitions
 PIECE_DEFINITIONS = {
     "O": {
-        "matrix": np.array([[1,1,0],
-                            [1,1,0],
-                            [0,0,0]]),
+        "matrix": np.array([[1,1],
+                            [1,1]]),
         "spritesheet_col": 7
     },
     "S": {
@@ -54,9 +47,9 @@ PIECE_DEFINITIONS = {
         "spritesheet_col": 5
     },
     "L": {
-        "matrix": np.array([[1,0,0],
-                            [1,0,0],
-                            [1,1,0]]),
+        "matrix": np.array([[0,1,0],
+                            [0,1,0],
+                            [0,1,1]]),
         "spritesheet_col": 3
     },
     "J": {

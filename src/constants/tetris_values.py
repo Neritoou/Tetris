@@ -1,15 +1,26 @@
 import numpy as np
 
-ROWS = 20; COLS = 10
+# Board
+ROWS = 20
+COLS = 10
 
+# Block size
 BLOCK_SIZE = (27,30)
 BLOCK_W = 27
 BLOCK_H = 30
 
+# Block padding
 BLOCK_PADDING = (4,4)
 BLOCK_PW = 4
 BLOCK_PH = 4
 
+# Gameplay
+SPAWN_ROW = 0
+SPAWN_COL = COLS // 2
+GRAVITY_DELAY = 0.3
+LOCK_DELAY = 0.5
+
+# Piece definitions
 PIECE_DEFINITIONS = {
     "O": {
         "matrix": np.array([[1,1,0],

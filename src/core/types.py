@@ -17,6 +17,12 @@ class PieceSurfaces(TypedDict):
     placed: Surface
     ghost: Surface
 
+class BlockSurfaces(TypedDict):
+    normal: Surface
+    placed: Surface
+    ghost: Surface
+
 class PieceData(TypedDict):
     matrices: List[ndarray]
     surfaces: PieceSurfaces
+    block: BlockSurfaces

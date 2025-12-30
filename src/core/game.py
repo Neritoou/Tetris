@@ -2,23 +2,21 @@ import pygame
 from arcade_machine_sdk import GameBase, GameMeta
 from ..resources import ResourceManager
 from ..controller import InputManager
-from ..states import StateManager, PlayState
+from ..states import *
 
 class Game(GameBase):
     def __init__(self, metadata: GameMeta) -> None:
         super().__init__(metadata)
-        self.resource_manager: ResourceManager = ResourceManager()
+        self.resources: ResourceManager = ResourceManager()
         self.input: InputManager = InputManager("config/controls.json")
         self.state: StateManager = StateManager(self)
- 
-
 
     def start(self, surface: pygame.Surface):
         super().start(surface)
         # Cargar Recursos 
-        self.resource_manager.load_resources()
+        self.resources.load()
         # Estado inicial       
-        self.state.change(PlayState)
+        self.state.change(StateID.PLAY)
 
     def handle_events(self, events: list[pygame.event.Event]) -> None:
         self.input.update(events)

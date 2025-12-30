@@ -1,5 +1,7 @@
 from ..core import OverlayType
 from typing import TYPE_CHECKING
+from .state_id import StateID
+from .play_state import PlayState
 import pygame
 
 if TYPE_CHECKING:
@@ -10,10 +12,13 @@ class StateManager:
     """
     Gestiona una pila de estados de juego (stack) con soporte para overlays y estados transitorios.
     """
-
-    def __init__(self,game: "Game"):
+    def __init__(self,game: "Game") -> None:
         self.stack: list["GameState"] = []
         self.game = game
+        # El diccionario mapea StateID con las clases correspondientes
+        self._state_classes = {
+            StateID.PLAY: PlayState,
+        }
 
     @property
     def current(self) -> "GameState":
@@ -23,17 +28,26 @@ class StateManager:
             raise ValueError("State Manager: No hay estados en la pila.")
         return self.stack[-1] 
     
-    def change(self, state_class: type["GameState"]):
+    def change(self, state_id: StateID) -> None:
         """
-        Reemplaza el estado actual por uno nuevo.
+        Cambia al estado indicado por su ID (por ejemplo, StateID.PLAY o StateID.PAUSE).
 
         - Si el nuevo estado NO es un overlay, el estado superior actual es eliminado
         - Si el nuevo estado ES un overlay, se apila sobre el estado actual sin eliminarlo.
+        Args:
+            state_id: identificador ENUM de StateID
         """
+        # Clase correspondiente al ID del estado
+        state_class = self._state_classes.get(state_id)
+        
+        if state_class is None:
+            raise ValueError(f"StateManager: Estado {state_id} no reconocido.")
+
         if self.stack and isinstance(self.current, state_class):
             raise ValueError(f"State Manager: El estado {state_class.__name__} ya está activo.")
-        
+
         new_state = state_class(self.game)
+
         if new_state.overlay_type == OverlayType.NONE and self.stack:
             self._pop()
         self._push(new_state)
@@ -48,7 +62,6 @@ class StateManager:
         if self.stack:
             self.current.on_exit()
             self.stack.pop()
-
 
     def handle_input(self, events: list[pygame.event.Event]) -> None:
         """Solo el estado superior recibe input"""

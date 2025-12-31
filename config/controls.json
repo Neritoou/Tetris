@@ -1,8 +1,12 @@
 {
     "controls": {
         "play": {
-            "move_left": ["d", "a"],
-            "move_right": ["w", "d"]
+            "move_left": ["a", "LEFT"],
+            "move_right": ["d", "RIGHT"],
+            "move_down": ["s", "DOWN"],
+            "rotate_piece_right": ["w", "UP"],
+            "rotate_piece_left": ["q"],
+            "lock_piece": ["SPACE"]
         },
         "ui": {
             "select": ["d"],

@@ -1,7 +1,7 @@
 import pygame
 import numpy as np
 from typing import Dict, List
-from ..core import PieceData, PieceSurfaces
+from ..core import PieceData, PieceSurfaces, BlockSurfaces
 
 class PieceLibrary:
     """
@@ -15,8 +15,8 @@ class PieceLibrary:
         self._pieces: Dict[str,PieceData] = {}
 
 
-    # --- METODOS ACCESIBLES ---
-    def register_piece(self,name: str, base_matrix: np.ndarray, blocks: PieceSurfaces) -> None:
+    # --- MÉTODOS ACCESIBLES ---
+    def register_piece(self,name: str, base_matrix: np.ndarray, blocks: BlockSurfaces) -> None:
         """
         Registra una nueva pieza en la biblioteca, generando sus rotaciones y surfaces.
 
@@ -38,7 +38,7 @@ class PieceLibrary:
                 "ghost": self._build_piece(base_matrix, blocks["ghost"]),
             }
 
-        self._pieces[name] = { "matrices": matrices, "surfaces": surfaces }
+        self._pieces[name] = { "matrices": matrices, "surfaces": surfaces, "block": blocks }
 
     def get_piece(self, name: str) -> PieceData:
         """Devuelve los datos completos de la pieza."""

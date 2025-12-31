@@ -56,6 +56,26 @@ class InputManager:
         """Verifica si un botón del mouse ha sido liberado."""
         return self._mouse.is_released(button)
 
+    def is_mouse_pressed_in_rect(self, button: str, rect: pygame.Rect) -> bool:
+        """Verifica si un botón está presionado dentro de un rectángulo."""
+        return self._mouse.is_pressed(button) and self._mouse.is_inside_rect(rect)
+
+    def is_mouse_held_in_rect(self, button: str, rect: pygame.Rect) -> bool:
+        """Verifica si un botón está siendo mantenido dentro de un rectángulo."""
+        return self._mouse.is_held(button) and self._mouse.is_inside_rect(rect)
+
+    def is_released_in_rect(self, button: str, rect: pygame.Rect) -> bool:
+        """Verifica si un botón ha sido liberado dentro de un rectángulo."""
+        return self._mouse.is_released(button) and self._mouse.is_inside_rect(rect)
+
+    def is_mouse_inside_rect(self, rect: pygame.Rect) -> bool:
+        """
+        Verifica si el mouse está dentro de un rectángulo.
+        rect: (x, y, width, height)
+        """
+        mx, my = self._mouse.pos
+        return rect.collidepoint(mx, my)
+
     def get_mouse_position(self) -> Tuple[int, int]:
         """Obtiene la posición del mouse."""
         return self._mouse.pos

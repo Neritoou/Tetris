@@ -85,10 +85,10 @@ class ResourceManager:
     def load_font(self, key: str, path: str, size: int) -> None:
         """Carga y almacena una fuente."""
         # Si el recurso ya existe, no se crea nuevamente
-        if key in self._fonts:
-            if self._fonts[key]["path"] == path:
+        if (key,size) in self._fonts:
+            if self._fonts[(key,size)]["path"] == path:
                 return
-            raise ValueError(f"Resource Manager: Font '{key}' ya tiene asociado un path distinto: '{self._fonts[key]['path']}'")
+            raise ValueError(f"Resource Manager: Font '{key}' ya tiene asociado un path distinto: '{self._fonts[(key,size)]['path']}'")
         
         self._assert_path_unused(path)   
         self._fonts[(key,size)] = {"path": path, "font": pygame.font.Font(path, size)}
@@ -114,28 +114,28 @@ class ResourceManager:
 
 
     # --- UNLOADERS ---
-    def unload_image(self, key) -> None:
+    def unload_image(self, key: str) -> None:
         """Elimina una imagen del Diccionario"""
         if key not in self._images:
             return
         self._loaded_paths.pop(self._images[key]["path"], None)
         self._images.pop(key)
 
-    def unload_sound(self, key) -> None:
+    def unload_sound(self, key: str) -> None:
         """Elimina un sonido del Diccionario"""
         if key not in self._sounds:
             return
         self._loaded_paths.pop(self._sounds[key]["path"], None)
         self._sounds.pop(key)
 
-    def unload_font(self, key) -> None:
+    def unload_font(self, key: str, size: int) -> None:
         """Elimina una fuente del Diccionario"""
-        if key not in self._fonts:
+        if (key,size) not in self._fonts:
             return
-        self._loaded_paths.pop(self._fonts[key]["path"], None)
-        self._fonts.pop(key)
+        self._loaded_paths.pop(self._fonts[(key,size)]["path"], None)
+        self._fonts.pop((key,size))
 
-    def unload_spritesheet(self, key) -> None:
+    def unload_spritesheet(self, key: str) -> None:
         """Elimina una imagen del Diccionario"""
         if key not in self._spritesheets:
             return

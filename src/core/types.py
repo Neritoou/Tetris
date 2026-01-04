@@ -1,4 +1,4 @@
-from enum import Enum, auto
+from enum import Enum, auto, IntEnum
 from pygame import Surface
 from numpy import ndarray
 from typing import List, TypedDict
@@ -11,7 +11,7 @@ class OverlayType(Enum):
 
 
 
-# INFORMACIÓN DE TIPAADO PARA LAS PIEZAS DE TETRIS
+# INFORMACIÓN DE TIPADO PARA LAS PIEZAS DE TETRIS
 class PieceSurfaces(TypedDict):
     normal: Surface
     placed: Surface
@@ -26,3 +26,14 @@ class PieceData(TypedDict):
     matrices: List[ndarray]
     surfaces: PieceSurfaces
     block: BlockSurfaces
+    color: int
+
+class BlockType(IntEnum):
+    EMPTY = 0
+    I = 6
+    O = 7
+    T = 4
+    S = 2
+    Z = 5
+    J = 1
+    L = 3

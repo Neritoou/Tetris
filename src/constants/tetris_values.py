@@ -31,39 +31,39 @@ BLOCK_PH = 4
 # Piece definitions
 PIECE_DEFINITIONS = {
     "O": {
-        "matrix": np.array([[1,1],
-                            [1,1]]),
+        "matrix": np.array([[7,7],
+                            [7,7]]),
         "spritesheet_col": 7
     },
     "S": {
-        "matrix": np.array([[0,1,1],
-                            [1,1,0],
+        "matrix": np.array([[0,2,2],
+                            [2,2,0],
                             [0,0,0]]),
         "spritesheet_col": 2
     },
     "T": {
-        "matrix": np.array([[1,1,1],
-                            [0,1,0],
+        "matrix": np.array([[4,4,4],
+                            [0,4,0],
                             [0,0,0]]),
         "spritesheet_col": 4
     },
     "I": {
-        "matrix": np.array([[1,1,1,1],
+        "matrix": np.array([[6,6,6,6],
                             [0,0,0,0],
                             [0,0,0,0],
                             [0,0,0,0]]),
         "spritesheet_col": 6
     },
     "Z": {
-        "matrix": np.array([[1,1,0],
-                            [0,1,1],
+        "matrix": np.array([[5,5,0],
+                            [0,5,5],
                             [0,0,0]]),
         "spritesheet_col": 5
     },
     "L": {
-        "matrix": np.array([[0,1,0],
-                            [0,1,0],
-                            [0,1,1]]),
+        "matrix": np.array([[0,3,0],
+                            [0,3,0],
+                            [0,3,3]]),
         "spritesheet_col": 3
     },
     "J": {
@@ -72,4 +72,15 @@ PIECE_DEFINITIONS = {
                             [0,1,1]]),
         "spritesheet_col": 1
     },
+}
+
+# Diccionario de mapeo de números a las piezas
+NUM_TO_PIECE = {
+    1: "J",
+    2: "S",
+    3: "L",
+    4: "T",
+    5: "Z",
+    6: "I",
+    7: "O",
 }

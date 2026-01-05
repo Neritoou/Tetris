@@ -27,22 +27,23 @@ class Piece:
         self.row: int = row
         self.col: int = col
         self.rot: int = rot
-        
+    
+    @property
+    def type(self) -> int:
+        return self._data["type"]
+    
     @property
     def matrix(self) -> np.ndarray:
         """Devuelve la matriz correspondiente a la rotación actual de la pieza."""
         return self._data["matrices"][self.rot]
     
-    def draw(self, surface: pygame.Surface, position_in_board: Tuple[int, int]) -> None:
-        """Dibuja la pieza en la ventana bloque por bloque."""
-        pos_x, pos_y = position_in_board
+    def draw_normal(self, surface: pygame.Surface, position_in_board: Tuple[int, int]) -> None:
+        """Dibuja la pieza normal usando su surface de bloque normal."""
+        self._draw_blocks(surface, position_in_board, self._data["block"]["normal"])
 
-        # Dibuja los bloques de la pieza en el tablero
-        for (r, c), block in np.ndenumerate(self.matrix):
-            if not block: continue
-            dx = pos_x + c * BLOCK_W
-            dy = pos_y + r * BLOCK_H
-            surface.blit(self._data["block"]["normal"], (dx, dy))
+    def draw_ghost(self, surface: pygame.Surface, position_in_board: Tuple[int, int]) -> None:
+        """Dibuja la pieza fantasma usando su surface de bloque ghost."""
+        self._draw_blocks(surface, position_in_board, self._data["block"]["ghost"])
 
     def move(self, dr: int, dc: int):
         """
@@ -91,3 +92,16 @@ class Piece:
             if block: 
                 cells.append((baserow + r, basecol + c))
         return cells
+    
+    # --- HELPERS ---
+    def _draw_blocks(self, surface: pygame.Surface, position_in_board: Tuple[int, int], block_surface: pygame.Surface) -> None:
+        """
+        Método interno que dibuja los bloques de la pieza usando la surface indicada.
+        """
+        pos_x, pos_y = position_in_board
+        for (r, c), block in np.ndenumerate(self.matrix):
+            if not block:
+                continue
+            dx = pos_x + c * BLOCK_W
+            dy = pos_y + r * BLOCK_H
+            surface.blit(block_surface, (dx, dy))

@@ -1,9 +1,11 @@
 import pygame
 import numpy as np
-from typing import Tuple, TYPE_CHECKING
+from typing import Dict, Tuple, TYPE_CHECKING
+from ..constants import NUM_TO_PIECE
 
 if TYPE_CHECKING:
     from .piece import Piece
+    from .types import PieceData
 
 class Board:
     """
@@ -13,7 +15,7 @@ class Board:
     el movimiento y rotación de la pieza activa mediante validaciones de 
     colisión y procesar la eliminación de líneas completas.
     """
-    def __init__(self, rows: int, cols: int, surface: pygame.Surface, block_surface: pygame.Surface,
+    def __init__(self, rows: int, cols: int, surface: pygame.Surface, 
                  cell_width: int, cell_height: int,
                  pos_x: int, pos_y: int) -> None:
         """
@@ -35,32 +37,33 @@ class Board:
 
         self.cell_width: int = cell_width
         self.cell_height: int = cell_height
-        self.block_surface = block_surface   # (!) QUITAR BLOCK_SURFACE
 
-    def draw(self, surface: pygame.Surface) -> None:
+    def draw(self, surface: pygame.Surface, pieces: "Dict[str, PieceData]") -> None:
         """Dibuja el fondo del tablero, los bloques estáticos y la pieza activa."""
         # Dibuja la Board
         surface.blit(self._surface, self._rect)
 
         # (!) Cambiar esto por una surface única x bloque
         for (row,col), block in np.ndenumerate(self.matrix):
-            if block > 0:
+            if block:
                 bx = self._rect.x + col * self.cell_width
                 by = self._rect.y + row * self.cell_height
-                surface.blit(self.block_surface, (bx, by))
+                block_surface = pieces[NUM_TO_PIECE[block]]["block"]["placed"]
+
+                surface.blit(block_surface, (bx, by))
 
     def lock_piece(self, current_piece: "Piece | None") -> None:
         """
         Bloquea la pieza actual en el tablero, marcando las celdas que ocupa como ocupadas 
         (con valor 1) en la matriz. Después de bloquearla, la pieza activa se elimina.
         """
-        if not current_piece:
+        if current_piece is None:
             return
         
         for r, c in current_piece.get_cells():
             # Verifica que la celda esté dentro del tablero
             if 0 <= r < self.rows and 0 <= c < self.cols: 
-                self.matrix[r, c] = 1 
+                self.matrix[r, c] = current_piece.type
 
     def clear_lines(self) -> int:
         """

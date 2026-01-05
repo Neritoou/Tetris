@@ -26,14 +26,7 @@ class PieceData(TypedDict):
     matrices: List[ndarray]
     surfaces: PieceSurfaces
     block: BlockSurfaces
-    color: int
+    type: int
 
-class BlockType(IntEnum):
-    EMPTY = 0
-    I = 6
-    O = 7
-    T = 4
-    S = 2
-    Z = 5
-    J = 1
-    L = 3
+
+

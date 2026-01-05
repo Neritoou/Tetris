@@ -22,4 +22,4 @@ def _load_pieces(rm: "ResourceManager") -> None:
             "placed": frames[1],
             "ghost": frames[2]
         }
-        rm.load_piece(name, base_matrix, blocks)
+        rm.load_piece(name, base_matrix, blocks, col)

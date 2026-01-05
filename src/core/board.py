@@ -1,8 +1,11 @@
 import pygame
 import numpy as np
+from typing import Dict, Tuple, TYPE_CHECKING
+from ..constants import NUM_TO_PIECE
 
-from .piece import Piece
-from ..constants import ROWS, COLS, BLOCK_H, BLOCK_W
+if TYPE_CHECKING:
+    from .piece import Piece
+    from .types import PieceData
 
 class Board:
     """
@@ -12,69 +15,57 @@ class Board:
     el movimiento y rotación de la pieza activa mediante validaciones de 
     colisión y procesar la eliminación de líneas completas.
     """
-    def __init__(self, board_surface: pygame.Surface, block_surface: pygame.Surface) -> None:
+    def __init__(self, rows: int, cols: int, surface: pygame.Surface, 
+                 cell_width: int, cell_height: int,
+                 pos_x: int, pos_y: int) -> None:
         """
         Inicializa el tablero del juego.
 
         Args:
-            board_surface: Imagen del tablero.
+            surface: Imagen del tablero.
             block_surface: Bloque individual de cada pieza.
         """
-        self.rows = ROWS
-        self.cols = COLS
+        self.rows: int = rows
+        self.cols: int = cols
+        self.matrix: np.ndarray = np.zeros((self.rows, self.cols), dtype=int)
 
-        self.board: np.ndarray = np.zeros((self.rows, self.cols), dtype=int)
-        self.board_surface = board_surface
+        self._surface = surface
+        self._width: int = self._surface.get_width()
+        self._height: int = self._surface.get_height()
+        self._rect: pygame.Rect = self._surface.get_rect()
+        self._rect.topleft = (pos_x, pos_y)
 
-        self.width = self.board_surface.get_width()
-        self.height = self.board_surface.get_height()
-        self._rect = self.board_surface.get_rect()
+        self.cell_width: int = cell_width
+        self.cell_height: int = cell_height
 
-        self.x = (1024 - self.width) // 2
-        self.y = (768 - self.height) // 2
-        self._rect.topleft = (self.x, self.y)
-
-        self.cell_width: int = BLOCK_W
-        self.cell_height: int = BLOCK_H
-        self.block_surface = block_surface
-        self.active_piece: Piece | None = None
-
-    def draw(self, surface: pygame.Surface):
+    def draw(self, surface: pygame.Surface, pieces: "Dict[str, PieceData]") -> None:
         """Dibuja el fondo del tablero, los bloques estáticos y la pieza activa."""
-        surface.blit(self.board_surface, self._rect)
+        # Dibuja la Board
+        surface.blit(self._surface, self._rect)
 
-        for r in range(self.rows):
-            for c in range(self.cols):
-                if self.board[r][c] > 0:
-                    bx = self.x + c * self.cell_width
-                    by = self.y + r * self.cell_height
-                    surface.blit(self.block_surface, (bx, by))
-        
-        if self.active_piece:
-            self.active_piece.draw(surface)
+        # (!) Cambiar esto por una surface única x bloque
+        for (row,col), block in np.ndenumerate(self.matrix):
+            if block:
+                bx = self._rect.x + col * self.cell_width
+                by = self._rect.y + row * self.cell_height
+                block_surface = pieces[NUM_TO_PIECE[block]]["block"]["placed"]
 
-    def spawn_piece(self, piece: Piece) -> None:
+                surface.blit(block_surface, (bx, by))
+
+    def lock_piece(self, current_piece: "Piece | None") -> None:
         """
-        Genera y centra la pieza en el tablero.
-        
-        Args:
-            piece (Piece): Nombre de la pieza.
-        """  
-        self.active_piece = piece        
-        piece.center_piece(self.cols)
-
-    def lock_piece(self):
-        """Bloquea la pieza en el tablero y elimina la pieza activa marcandola como 'placed'."""
-        if not self.active_piece:
+        Bloquea la pieza actual en el tablero, marcando las celdas que ocupa como ocupadas 
+        (con valor 1) en la matriz. Después de bloquearla, la pieza activa se elimina.
+        """
+        if current_piece is None:
             return
         
-        for r, c in self.active_piece.get_cells():
-            if 0 <= r < self.rows and 0 <= c < self.cols:
-                self.board[r, c] = 1
-        self.active_piece.state = "placed"
-        self.active_piece = None
+        for r, c in current_piece.get_cells():
+            # Verifica que la celda esté dentro del tablero
+            if 0 <= r < self.rows and 0 <= c < self.cols: 
+                self.matrix[r, c] = current_piece.type
 
-    def clear_lines(self):
+    def clear_lines(self) -> int:
         """
         Escanea el tablero para eliminar filas llenas y desplazar las filas
         superiores hacia abajo.
@@ -83,94 +74,21 @@ class Board:
             int: Cantidad de líneas eliminadas.
         """
         lines_cleared = 0
-        for r in range(self.rows):
-            zeros = 0
-            for c in range(self.cols):
-                if self.board[r][c] == 0:
-                    zeros += 1
-            if zeros == 0:
-                lines_cleared += 1
-                for rl in range(r, 1, -1):
-                    for c in range (self.cols):
-                        self.board[rl][c] = self.board[rl - 1][c]
+
+        # Detecta las filas llenas
+        fullrows = self.__find_fullrows()
+
+        if len(fullrows) > 0:
+            lines_cleared = len(fullrows)
+            # EN CASO DE HACER ANIMACIONES, AQUI DEBERIAN DE IR
+
+            # Elimina las filas completas y las desplaza
+            self.__remove_filled_lines(fullrows)
+
         return lines_cleared
     
-    def try_move(self, dr: int, dc: int) -> bool:
-        """
-        Intenta desplazar la pieza activa si el movimiento es válido.
-
-        Args:
-            dr: Cantidad de filas que se intenta mover la pieza.
-            dc: Cantidad de columnas que se intenta mover la pieza.
-                0 para no cambiar esa posicion, 1 para mover hacia la derecha o abajo, -1 para la izquierda.
-
-        Returns:
-            bool: True si el movimiento es posible, False si no.
-        """
-        if not self.active_piece:
-            return False
-        
-        new_row = self.active_piece.row + dr
-        new_col = self.active_piece.col + dc
-
-        if self.is_valid(self.active_piece, new_row, new_col):
-            self.active_piece.move(dr, dc)
-            return True
-        return False
-    
-    def try_fall_piece(self) -> bool:
-        """
-        Permite que la pieza caiga por gravedad de ser posible.
-
-        Returns:
-            bool: True mientras se pueda mover, False cuando no.
-        """
-        if not self.active_piece:
-            return False
-        
-        if self.try_move(1, 0):
-            return True
-        return False
-
-    def try_rotate(self, direction: int = 1) -> bool:
-        """
-        Intenta rotar la pieza activa y valida el resultado.
-
-        Args:
-            direction: Sentido del giro (1 para horario, -1 para antihorario).
-
-        Returns:
-            bool: True si la rotación fue exitosa y se mantuvo; 
-                  False si fue ilegal y se tuvo que revertir.
-        """
-        if not self.active_piece:
-            return False
-        
-        piece = self.active_piece
-        old_rot = piece.rot
-        
-        piece.rotate(direction)
-
-        if self.is_valid(piece):
-            return True
-        
-        # Si la rotación no es es válida, se revierte
-        piece.rot = old_rot
-        return False
-    
-        # (!) Intentar implementar los wall kicks
-
-    # --- MÉTODOS PARA VALIDAR ---
-    def is_game_over(self) -> bool:
-        """Verifica si la pieza recién generada colisiona de inmediato."""
-
-        if not self.active_piece:
-            return False
-        if self.is_valid(self.active_piece):
-            return False
-        return True
-    
-    def is_valid(self, piece: Piece, row: int | None = None, col: int | None = None) -> bool:
+    # (?) al spawnear la pieza, no siempre empieza en uan pos posible
+    def is_valid(self, current_piece: "Piece", row: int | None = None, col: int | None = None) -> bool:
         """
         Verifica si la pieza colisiona con los bordes o bloques existentes.
 
@@ -183,11 +101,56 @@ class Board:
             bool: True si la posición está libre, False si no está ocupada o fuera de límites.
 
         """
-        for r, c in piece.get_cells(row, col):
+        for r, c in current_piece.get_cells(row, col):
             if r >= self.rows:
                 return False
             if c < 0 or c >= self.cols: 
                 return False
-            if r >= 0 and self.board[r, c]: 
+            if r >= 0 and self.matrix[r, c]: 
                 return False
         return True
+    
+
+    # --- HELPERS ---
+    def get_pixels_of_cell(self, row: int, col: int) -> Tuple[int, int]:
+        """
+        Convierte una posición de celda del tablero (row, col) en coordenadas
+        absolutas en píxeles para dibujar la pieza en pantalla.
+
+        La conversión toma como origen la esquina superior izquierda del tablero
+        y aplica el tamaño de cada celda.
+
+        Args:
+            row: Fila de la celda dentro del tablero.
+            col: Columna de la celda dentro del tablero.
+
+        Returns:
+            Tuple[int, int]: Coordenadas (x, y) en píxeles dentro de la ventana.
+        """
+        return ((self._rect.x + col * self.cell_width), (self._rect.y + row * self.cell_height))
+    
+    def __find_fullrows(self) -> np.ndarray:
+        """
+        Encuentra las filas llenas en el tablero (todas las celdas tienen un valor diferente de 0).
+
+        Returns:
+            np.ndarray: Un arreglo con los índices de las filas completas.
+        """
+        # Verifica si todas las celdas en cada fila son diferentes de 0
+        fullrows = np.where(np.all(self.matrix != 0, axis=1))[0]
+        return fullrows
+    
+    def __remove_filled_lines(self, fullrows: np.ndarray) -> None:
+        """
+        Elimina las filas llenas de la matriz y las desplaza hacia abajo.
+
+        Args:
+            fullrows: Las filas que deben ser eliminadas.
+        """
+        # Elimina las filas completas de la matriz
+        self.matrix = np.delete(self.matrix, fullrows, axis=0)
+
+        # Añade filas vacías (llenas de ceros) en la parte superior del tablero
+        new_emptyrows = np.zeros((len(fullrows), self.cols), dtype=int) # Crea las filas vacias
+        self.matrix = np.vstack((new_emptyrows, self.matrix)) # Las anexa a la matrix
+    

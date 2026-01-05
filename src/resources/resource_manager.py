@@ -52,8 +52,11 @@ class ResourceManager:
     def get_piece(self, key: str) -> "PieceData":
         """Obtiene una pieza registrada en la biblioteca."""
         return self._piece_library.get_piece(key)
-
-
+    
+    def get_pieces(self) -> "Dict[str, PieceData]":
+        return self._piece_library.pieces
+    
+    
 
     # --- LOADERS ---
     def load_image(self, key: str, path: str) -> None:
@@ -107,9 +110,9 @@ class ResourceManager:
         self._spritesheets[key] = {"path": path, "spritesheet": SpriteSheet(image,frame_size,padding)}
         self._loaded_paths[path] = key
 
-    def load_piece(self, key: str, base_matrix: "np.ndarray", blocks: "PieceSurfaces") -> None:
+    def load_piece(self, key: str, base_matrix: "np.ndarray", blocks: "PieceSurfaces", type: int) -> None:
         """Registra una pieza en la biblioteca interna."""
-        self._piece_library.register_piece(key, base_matrix,blocks)
+        self._piece_library.register_piece(key, base_matrix,blocks,type)
 
 
 

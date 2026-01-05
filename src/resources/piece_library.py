@@ -14,9 +14,8 @@ class PieceLibrary:
         """Inicializa el registro de piezas vacío."""
         self._pieces: Dict[str,PieceData] = {}
 
-
     # --- MÉTODOS ACCESIBLES ---
-    def register_piece(self,name: str, base_matrix: np.ndarray, blocks: BlockSurfaces) -> None:
+    def register_piece(self,name: str, base_matrix: np.ndarray, blocks: BlockSurfaces, type: int) -> None:
         """
         Registra una nueva pieza en la biblioteca, generando sus rotaciones y surfaces.
 
@@ -38,22 +37,12 @@ class PieceLibrary:
                 "ghost": self._build_piece(base_matrix, blocks["ghost"]),
             }
 
-        self._pieces[name] = { "matrices": matrices, "surfaces": surfaces, "block": blocks }
+        self._pieces[name] = { "matrices": matrices, "surfaces": surfaces, "block": blocks, "type": type}
 
     def get_piece(self, name: str) -> PieceData:
         """Devuelve los datos completos de la pieza."""
         self._assert_valid_piece(name)
         return self._pieces[name]
-
-    def get_piece_matrix(self, name: str, rotation: int = 0) -> np.ndarray:
-        """Obtiene la matriz de la pieza según la rotación especificada.
-
-        Rotation se normaliza para permitir overflow (ej. -1 => última rotación).
-        """
-        self._assert_valid_piece(name)
-        matrices = self._pieces[name]["matrices"]
-        rotation %= len(matrices)
-        return matrices[rotation]
     
     def get_piece_surface(self, name: str, state: str = "normal") -> pygame.Surface:
         """Obtiene la superficie de la pieza para el estado dado ('normal', 'placed', 'ghost')."""
@@ -61,6 +50,10 @@ class PieceLibrary:
         if state not in self._pieces[name]["surfaces"]:
             raise ValueError(f"PieceLibrary: la Surface '{state}' de la pieza '{name}' no existe")
         return self._pieces[name]["surfaces"][state]
+    
+    @property
+    def pieces(self) -> Dict[str,PieceData]:
+        return self._pieces
     
 
 

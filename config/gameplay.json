@@ -1,0 +1,39 @@
+{
+    "gameplay": {
+        "general": {
+            "starting_level": 1,
+            "lines_per_level": 10,
+            "fall_delay": 0.3,
+            "lock_delay": 0.05
+        },
+        "score": {
+            "soft_drop": 1,
+            "hard_drop": 2,
+            "combo_bonus": 50,
+            "back_to_back_multiplier": 1.5
+        },
+        "lines_cleared": {
+            "single": 100,
+            "double": 300,
+            "triple": 500,
+            "tetris": 800
+        },
+        "t_spin": {
+            "single": 800,
+            "double": 400,
+            "triple": 1600
+        },
+        "mini_t_spin": {
+            "normal": 100,
+            "single": 200,
+            "double": 400
+        },
+        "back_to_back": {
+            "tetris": 1200,
+            "mini_t_spin_double": 600,
+            "t_spin_single": 1200,
+            "t_spin_double": 1800,
+            "t_spin_triple": 2400
+        }
+    }
+}    

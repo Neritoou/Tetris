@@ -1,4 +1,4 @@
-from enum import Enum, auto, IntEnum
+from enum import Enum, auto
 from pygame import Surface
 from numpy import ndarray
 from typing import List, TypedDict

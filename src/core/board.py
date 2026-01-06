@@ -25,8 +25,8 @@ class Board:
             surface: Imagen del tablero.
             block_surface: Bloque individual de cada pieza.
         """
-        self.rows: int = rows
-        self.cols: int = cols
+        self.rows = rows
+        self.cols = cols
         self.matrix: np.ndarray = np.zeros((self.rows, self.cols), dtype=int)
 
         self._surface = surface
@@ -35,15 +35,14 @@ class Board:
         self._rect: pygame.Rect = self._surface.get_rect()
         self._rect.topleft = (pos_x, pos_y)
 
-        self.cell_width: int = cell_width
-        self.cell_height: int = cell_height
+        self.cell_width = cell_width
+        self.cell_height = cell_height
 
     def draw(self, surface: pygame.Surface, pieces: "Dict[str, PieceData]") -> None:
         """Dibuja el fondo del tablero, los bloques estáticos y la pieza activa."""
         # Dibuja la Board
         surface.blit(self._surface, self._rect)
 
-        # (!) Cambiar esto por una surface única x bloque
         for (row,col), block in np.ndenumerate(self.matrix):
             if block:
                 bx = self._rect.x + col * self.cell_width
@@ -57,7 +56,7 @@ class Board:
         Bloquea la pieza actual en el tablero, marcando las celdas que ocupa como ocupadas 
         (con valor 1) en la matriz. Después de bloquearla, la pieza activa se elimina.
         """
-        if current_piece is None:
+        if not current_piece:
             return
         
         for r, c in current_piece.get_cells():
@@ -153,4 +152,3 @@ class Board:
         # Añade filas vacías (llenas de ceros) en la parte superior del tablero
         new_emptyrows = np.zeros((len(fullrows), self.cols), dtype=int) # Crea las filas vacias
         self.matrix = np.vstack((new_emptyrows, self.matrix)) # Las anexa a la matrix
-    

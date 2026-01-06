@@ -3,12 +3,15 @@ from arcade_machine_sdk import GameBase, GameMeta
 from ..resources import ResourceManager
 from ..controller import InputManager
 from ..states import *
+from ..config import *
 
 class Game(GameBase):
     def __init__(self, metadata: GameMeta) -> None:
         super().__init__(metadata)
+        self.input_config = InputConfig("config/controls.json")
+        self.gameplay_config = BaseConfig(path = "config/gameplay.json")
         self.resources: ResourceManager = ResourceManager()
-        self.input: InputManager = InputManager("config/controls.json")
+        self.input: InputManager = InputManager()
         self.state: StateManager = StateManager(self)
 
     def start(self, surface: pygame.Surface):

@@ -46,7 +46,7 @@ class StateManager:
         if self.stack and isinstance(self.current, state_class):
             raise ValueError(f"State Manager: El estado {state_class.__name__} ya está activo.")
 
-        new_state = state_class(self.game, *kwargs)
+        new_state = state_class(self.game, **kwargs)
 
         if new_state.overlay_type == OverlayType.NONE and self.stack:
             self._pop()

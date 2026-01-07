@@ -28,6 +28,7 @@ class Piece:
         self.col = col
         self.rot = rot
     
+    
     @property
     def type(self) -> int:
         return self._data["type"]

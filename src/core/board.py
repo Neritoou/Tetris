@@ -109,6 +109,10 @@ class Board:
                 return False
         return True
     
+    def is_empty(self) -> bool:
+        """Verifica si el tablero está vacío (sin piezas bloqueadas)."""
+        return not np.any(self.matrix)
+
 
     # --- HELPERS ---
     def get_pixels_of_cell(self, row: int, col: int) -> Tuple[int, int]:

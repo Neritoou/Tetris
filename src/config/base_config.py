@@ -5,11 +5,11 @@ from copy import deepcopy
 class BaseConfig():
     def __init__(self, *, path: str = "", data: Dict[Any, Any]= {}):
 
-        if path: self.data = json.load(path)
-        elif data: self.data = data
+        if path: self._data = json.load(path)
+        elif data: self._data = data
         else: raise ValueError(f"BaseConfig: no se implementó ninguna estrategia de inicialización")
   
-        self._buffer = deepcopy(self.data)  # Buffer temporal
+        self._buffer = deepcopy(self._data)  # Buffer temporal
         self._modified_keys = set()  # Claves modificadas
 
     # --- Acceso seguro al buffer ---
@@ -25,10 +25,14 @@ class BaseConfig():
     def apply_changes(self):
         """Aplica solo las claves modificadas al data."""
         for key in self._modified_keys:
-            self.data[key] = self._buffer[key]
+            self._data[key] = self._buffer[key]
         self._modified_keys.clear()
 
     def discard_changes(self):
         """Descarta los cambios en el buffer."""
-        self._buffer = deepcopy(self.data)
+        self._buffer = deepcopy(self._data)
         self._modified_keys.clear()
+
+    def get_data(self) -> Dict[Any, Any]:
+        """ Retorna el diccionario de datos de la Configuración"""
+        return self._data

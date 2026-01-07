@@ -1,17 +1,22 @@
-from typing import Tuple, Dict, TYPE_CHECKING
+from typing import Tuple, Any, Dict, TYPE_CHECKING
 from .board import Board
 from .piece import Piece
 from .piece_spawner import PieceSpawner
+from .score import Score
 from pygame import Surface
 
 if TYPE_CHECKING:
     from .types import PieceData
 
 class GameBoardController:
-    def __init__(self, board: Board, spawner: PieceSpawner):
+    def __init__(self, board: Board, spawner: PieceSpawner, score: Score):
+        self.score = score
         self.board = board
         self.spawner = spawner
         self.piece: Piece | None = None
+
+        self.soft_drop: int = 0
+        self.hard_drop: int = 0
 
     def spawn_piece(self) -> None:
         """Genera y coloca una nueva pieza en el tablero."""
@@ -31,6 +36,21 @@ class GameBoardController:
 
         self.piece.draw_normal(surface, pos_normal)
         self.piece.draw_ghost(surface, pos_ghost)
+
+    def resolve_piece_lock(self):
+        """Bloquea la pieza en el tablero, elimina las líneas completas, y verifica si el tablero está vacío."""
+        self.board.lock_piece(self.piece)
+        self.piece = None
+        lines = self.board.clear_lines()
+        perfect_clear = self.board.is_empty()
+        dict: Dict[str, Any] = { "type": "normal",
+            "lines_cleared": lines, "perfect_clear": perfect_clear,
+            "soft_drop": self.soft_drop, "hard_drop": self.hard_drop }
+        
+        # Reincia las variables de los Drops
+        self.soft_drop = 0
+        self.hard_drop = 0
+        return dict
 
     def try_move_to(self, dr: int, dc: int) -> bool:
         """
@@ -52,6 +72,7 @@ class GameBoardController:
 
         if self.board.is_valid(self.piece, new_row, new_col):
             self.piece.move(dr, dc)
+            if dr > 0 and self.hard_drop == 0: self.soft_drop += 1
             return True
         return False
     
@@ -64,6 +85,15 @@ class GameBoardController:
         """
         return self.try_move_to(1, 0)  # Intentar mover hacia abajo (dr=1, dc=0)
 
+    def try_hard_drop(self):
+        """Realiza un hard drop (la pieza cae de golpe)."""
+        distance = 0
+        self.hard_drop = 1
+        while self.try_move_to(1, 0):
+            distance += 1
+        # el hard drop es contado por las filas que la pieza descendió
+        self.hard_drop = distance - 1
+    
     def try_rotate(self, direction: int = 1) -> bool:
         """
         Intenta rotar la pieza activa y valida el resultado.

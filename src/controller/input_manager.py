@@ -1,20 +1,16 @@
 import pygame
 from typing import List, Tuple
 from .key_input import KeyInputManager
-from .mapping import KeyMappingManager
 from .mouse_input import MouseInputManager
-
-# (!) AÑADIR METODOS PARA LA MODIFICACION DE TECLAS EN OPCIONES
 
 class InputManager:
     """
     Administra el estado de los controles y mapea teclas a acciones semánticas.
     También permite guardar y cargar configuraciones de teclas desde un archivo JSON.
     """
-    def __init__(self, config_path: str) -> None:
+    def __init__(self) -> None:
         self._key = KeyInputManager()  # Maneja eventos del teclado
         self._mouse = MouseInputManager()  # Maneja eventos del mouse
-        self._map = KeyMappingManager(config_path)  # Maneja el mapeo de teclas y acciones
 
     def update(self, events: List[pygame.event.Event]) -> None:
         """Actualiza los estados de las acciones según los eventos del frame."""
@@ -79,5 +75,4 @@ class InputManager:
     def get_mouse_position(self) -> Tuple[int, int]:
         """Obtiene la posición del mouse."""
         return self._mouse.pos
-    
 

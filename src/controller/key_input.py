@@ -1,6 +1,6 @@
 from typing import Dict, List, Set, Tuple
 import pygame
-from .map_config import KeyMapConfig
+from .map_config import KeyMap
 
 class KeyInputManager:
     def __init__(self) -> None:
@@ -10,7 +10,7 @@ class KeyInputManager:
         self._released: Set[Tuple[str, str]] = set()
 
         # Mapeo inverso: tecla pygame -> lista de (context, action)
-        self._key_to_actions: Dict[int, List[Tuple[str, str]]] = KeyMapConfig.get_key_to_actions()
+        self._key_to_actions: Dict[int, List[Tuple[str, str]]] = KeyMap.get_key_to_actions()
 
 
     @property
@@ -27,17 +27,17 @@ class KeyInputManager:
     
     def is_pressed(self, context: str, action: str) -> bool:
         """Verifica si la acción está presionada en el contexto."""
-        KeyMapConfig.assert_action(context, action)
+        KeyMap.assert_action(context, action)
         return (context, action) in self._pressed
 
     def is_held(self, context: str, action: str) -> bool:
         """Verifica si la acción está mantenida en el contexto."""
-        KeyMapConfig.assert_action(context, action)
+        KeyMap.assert_action(context, action)
         return (context, action) in self._held
 
     def is_released(self, context: str, action: str) -> bool:
         """Verifica si la acción ha sido liberada en el contexto."""
-        KeyMapConfig.assert_action(context, action)
+        KeyMap.assert_action(context, action)
         return (context, action) in self._released
     
     # Detectar input del Teclado

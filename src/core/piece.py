@@ -22,11 +22,12 @@ class Piece:
             col: Columna inicial de la pieza en el tablero.
             rot: Indice de la rotación actual.
         """
-        self.name: str = name
-        self._data: "PieceData" = data
-        self.row: int = row
-        self.col: int = col
-        self.rot: int = rot
+        self.name = name
+        self._data = data
+        self.row = row
+        self.col = col
+        self.rot = rot
+    
     
     @property
     def type(self) -> int:

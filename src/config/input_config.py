@@ -1,25 +1,54 @@
 from arcade_machine_sdk import json
 from typing import Dict, List, Set, Tuple
 from ..util.conversors import pygame_key_to_str, str_to_pygame_key
-from .map_config import KeyMapConfig
+from ..controller.map_config import KeyMap
+from .base_config import BaseConfig
 
-class KeyMappingManager:
-    """Gestiona el mapeo de teclas, carga y guardado."""
+class InputConfig(BaseConfig):
+    """
+    Manager responsable de:
+    - Cargar el mapeo de teclas desde JSON
+    - Guardar el estado actual en JSON
+    - Convertir entre nombres legibles y pygame.K_*
+
+    IMPORTANTE:
+    Esta clase NO es dueña del estado.
+    El estado real vive en KeyMapConfig (singleton lógico).
+    """
     def __init__(self, config_path: str):
+        """
+        Inicializa el manager y sincroniza el estado desde el JSON.
+
+        :param config_path: Ruta al archivo controls.json
+        """
         self.config_path = config_path
         # Mapeo: context -> action -> set de teclas (pygame.K_*)
-        self._key_map: Dict[str, Dict[str, Set[int]]] = KeyMapConfig.get_key_map()
+        self._key_map: Dict[str, Dict[str, Set[int]]] = KeyMap.get_key_map()
         # Mapeo Inverso: Pygame -> Lista de (context, action)
-        self._key_to_actions: Dict[int, List[Tuple[str, str]]] = KeyMapConfig.get_key_to_actions()
+        self._key_to_actions: Dict[int, List[Tuple[str, str]]] = KeyMap.get_key_to_actions()
+        # Sincroniza memoria ← JSON
         self.load()
 
+        super().__init__(data = self._key_map)
+
     def get_keys_for_action(self, context: str, action: str) -> List[int]:
-        KeyMapConfig.assert_action(context, action)
+        """
+        Devuelve las teclas asignadas a una acción.
+
+        :return: Lista de pygame.K_*
+        """
+        KeyMap.assert_action(context, action)
         return list(self._key_map.get(context, {}).get(action, set()))
     
     # Cargar la variable con los datos del JSON
     def load(self) -> None:
-        """Carga el mapeo de teclas desde un archivo JSON."""
+        """
+        Carga el mapeo de teclas desde el JSON.
+
+        Flujo: 
+        
+        JSON -> validación -> conversión -> estado global
+        """
         data = json.load(self.config_path)
         controls = data.get("controls")
         if not isinstance(controls, dict):
@@ -41,14 +70,21 @@ class KeyMappingManager:
                 # Asocia las teclas convertidas a la acción
                 self._bind_keys_to_action(context, action, pygame_keys)
 
+    def apply_changes(self):
+        super().apply_changes()
+        self.save()
+
     # Guardar los datos de la variable en el JSON
     def save(self) -> None:
-        """Guarda el mapeo de teclas en un archivo JSON sin recrear todo el diccionario."""
-        json_data = json.load(self.config_path)
+        """
+        Guarda el estado actual del mapeo en el JSON.
 
-        # Asegurarse de que la clave "controls" exista
-        if "controls" not in json_data:
-            json_data["controls"] = {}
+        Flujo:
+        
+        estado global -> conversión -> JSON
+        """
+        json_data = {}
+        json_data["controls"] = {}
 
         # Modificar solo la sección de "controls" y convertir las teclas
         for context, actions in self._key_map.items():
@@ -63,7 +99,9 @@ class KeyMappingManager:
 
 
     def _bind_keys_to_action(self, context: str, action: str, keys: List[int]) -> None:
-        """Asocia múltiples teclas a una acción dentro de un contexto."""
+        """Asocia múltiples teclas a una acción dentro de un contexto.
+
+        Este método se utiliza únicamente al cargar los datos del JSON"""
         # key_map 
         self._key_map.setdefault(context, {})
         self._key_map[context].setdefault(action, set())
@@ -75,4 +113,3 @@ class KeyMappingManager:
             pair = (context, action)
             if pair not in self._key_to_actions[key]:
                 self._key_to_actions[key].append(pair)
-

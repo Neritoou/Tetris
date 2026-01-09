@@ -1,7 +1,9 @@
 import pygame
 import numpy as np
-from typing import Dict, List
-from ..core import PieceData, PieceSurfaces, BlockSurfaces
+from typing import Dict, List, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from ..core.types import PieceData, PieceSurfaces, BlockSurfaces
 
 class PieceLibrary:
     """
@@ -12,10 +14,10 @@ class PieceLibrary:
     """
     def __init__(self) -> None:
         """Inicializa el registro de piezas vacío."""
-        self._pieces: Dict[str,PieceData] = {}
+        self._pieces: "Dict[str,PieceData]" = {}
 
     # --- MÉTODOS ACCESIBLES ---
-    def register_piece(self,name: str, base_matrix: np.ndarray, blocks: BlockSurfaces, type: int) -> None:
+    def register_piece(self,name: str, base_matrix: np.ndarray, blocks: "BlockSurfaces", type: int) -> None:
         """
         Registra una nueva pieza en la biblioteca, generando sus rotaciones y surfaces.
 
@@ -31,7 +33,7 @@ class PieceLibrary:
 
         matrices = self._generate_rotations(base_matrix)
 
-        surfaces: PieceSurfaces = {
+        surfaces: "PieceSurfaces" = {
                 "normal": self._build_piece(base_matrix, blocks["normal"]),
                 "placed": self._build_piece(base_matrix, blocks["placed"]),
                 "ghost": self._build_piece(base_matrix, blocks["ghost"]),
@@ -39,7 +41,7 @@ class PieceLibrary:
 
         self._pieces[name] = { "matrices": matrices, "surfaces": surfaces, "block": blocks, "type": type}
 
-    def get_piece(self, name: str) -> PieceData:
+    def get_piece(self, name: str) -> "PieceData":
         """Devuelve los datos completos de la pieza."""
         self._assert_valid_piece(name)
         return self._pieces[name]
@@ -52,7 +54,7 @@ class PieceLibrary:
         return self._pieces[name]["surfaces"][state]
     
     @property
-    def pieces(self) -> Dict[str,PieceData]:
+    def pieces(self) -> "Dict[str,PieceData]":
         return self._pieces
     
 

@@ -1,33 +1,59 @@
 import pygame
 from typing import Tuple
-from ..ui_element import UIElement 
 
-class UIStaticElement(UIElement):
+from ...ui import UIElement
+
+class UIStatic(UIElement):
     """
-    Elemento UI estático.
+    Elemento visual estático sin interacción para la inferfaz de usuario.
 
     Se utiliza para renderizar imágenes que no requieren interacción,
-    como fondos, iconos, marcos o elementos decorativos del HUD.
+    como fondos, iconos, marcos o elementos decorativos del HUD que no
+    responden a eventos del mouse.
     """
-    def __init__(self, name: str,
-        surface: pygame.Surface, position: Tuple[int, int], *,
-        copy_surface: bool = False, scale: float = 1.0,
-        visible: bool = True
+    def __init__(
+            self, name: str, x: int, y: int,
+            image: pygame.Surface, *, visible: bool = True,
+            alpha: int = 255, scale: float = 1.0, angle: int = 0
     ):
-        super().__init__(name, surface, position,
-                        copy_surface = copy_surface, scale = scale, 
-                        visible = visible, enabled = False)
+        """
+        Inicializa las propiedades de los elementos estáticos.
+        
+        Args:
+            image: La superficie de la imagen que se mostrará.
+        """
+        self.original_img = image
+        self.img = self._apply_transformations(image, scale, angle)
+        
+        width, height = self.img.get_size()
 
+        super().__init__(name, x, y, width, height, visible=visible, enabled=False,
+                         alpha=alpha, scale=scale, angle=angle)
+
+
+
+    # --- MÉTODOS ABSTRACTOS DE UIElement ---
     def render(self, surface: pygame.Surface) -> None:
-        """ Renderiza el elemento en la superficie destino."""
-        if not self._visible:
+        """Renderiza el elemento en la superficie destino."""
+        if not self.visible:
             return
-        surface.blit(self._surface, self._rect)
+        
+        self.img.set_alpha(int(self.alpha))
+        surface.blit(self.img, self.rect)
 
     def update(self, dt: float) -> None:
-        """
-        Actualiza el estado del elemento.
-        UIStaticElement no tiene lógica de actualización, por lo que
-        este método se mantiene vacío por diseño.
-        """
-        pass
+        super().update(dt)
+
+
+
+    # --- MÉTODOS PRIVADOS ---
+    def _apply_transformations(self, img: pygame.Surface, scale: float, angle: int) -> pygame.Surface:
+        """Aplica transformaciones a la imagen (escala o rotación)."""        
+        new_img = img
+
+        if scale != 1.0:
+            width, height = img.get_size()
+            new_img = pygame.transform.scale(new_img, (int(width * scale), int(height * scale)))
+        if angle != 0:
+            new_img = pygame.transform.rotate(new_img, angle)
+        return new_img

@@ -4,4 +4,4 @@ class StateID(Enum):
     PLAY = auto()
     MENU = auto()
     COUNTDOWN = auto()
-    # Más estados 
+    # Más estados

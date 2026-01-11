@@ -1,5 +1,5 @@
 import pygame
-from typing import Dict, Tuple, TypeVar, TYPE_CHECKING
+from typing import Dict, Tuple, List, TypeVar, TYPE_CHECKING
 from .spritesheet import SpriteSheet
 from .piece_library import PieceLibrary
 from .loaders import *
@@ -14,14 +14,12 @@ K = TypeVar("K")
 
 class ResourceManager:
     """Gestor de recursos del juego: imágenes, sonidos, fuentes, spritesheets y piezas."""
-
-
     def __init__(self):
         """Inicializa los contenedores de recursos vacíos."""
-        self._images: dict[str, ImageResource] = {}
-        self._fonts: dict[tuple[str,int], FontResource] = {}
-        self._sounds: dict[str, SoundResource] = {}
-        self._spritesheets: dict[str, SpriteSheetResource] = {}
+        self._images: Dict[str, ImageResource] = {}
+        self._fonts: Dict[str, FontResource] = {}
+        self._sounds: Dict[str, SoundResource] = {}
+        self._spritesheets: Dict[str, SpriteSheetResource] = {}
         self._piece_library: PieceLibrary = PieceLibrary()
 
         self._loaded_paths: Dict[str, str] = {}
@@ -41,8 +39,8 @@ class ResourceManager:
 
     def get_font(self, key: str, size: int) -> pygame.font.Font:
         """Obtiene una fuente cargada."""
-        resource = self._get_resource(self._fonts, (key, size), "Font")
-        return resource["font"]
+        resource = self._get_resource(self._fonts, key, "Font")
+        return resource["font"][size]
     
     def get_spritesheet(self, key: str) -> SpriteSheet:
         """Obtiene una hoja de sprites cargada."""
@@ -85,16 +83,23 @@ class ResourceManager:
         self._sounds[key] = {"path": path, "sound": pygame.mixer.Sound(path)}
         self._loaded_paths[path] = key
 
-    def load_font(self, key: str, path: str, size: int) -> None:
-        """Carga y almacena una fuente."""
-        # Si el recurso ya existe, no se crea nuevamente
-        if (key,size) in self._fonts:
-            if self._fonts[(key,size)]["path"] == path:
+    def load_font(self, key: str, path: str, sizes: set[int]) -> None:
+        """
+        Carga y almacena una fuente.
+
+        Si ya existe un font con el mismo nombre (key) y tiene
+        asociado el mismo path, se ignora (no lo carga).
+
+        Raises:
+            ValueError: 
+        """
+        if key in self._fonts:
+            if self._fonts[key]["path"] == path:
                 return
-            raise ValueError(f"Resource Manager: Font '{key}' ya tiene asociado un path distinto: '{self._fonts[(key,size)]['path']}'")
-        
+            raise ValueError(f"Resource Manager: Font '{key}' ya tiene asociado un path distinto: '{self._fonts[key]['path']}'")
+
         self._assert_path_unused(path)   
-        self._fonts[(key,size)] = {"path": path, "font": pygame.font.Font(path, size)}
+        self._fonts[key] = {"path": path, "font": {s: pygame.font.Font(path, s) for s in sizes}}
         self._loaded_paths[path] = key
 
     def load_spritesheet(self, key: str, path: str, frame_size: Tuple[int,int], padding: Tuple[int,int] = (0,0)) -> None:
@@ -131,12 +136,12 @@ class ResourceManager:
         self._loaded_paths.pop(self._sounds[key]["path"], None)
         self._sounds.pop(key)
 
-    def unload_font(self, key: str, size: int) -> None:
+    def unload_font(self, key: str) -> None:
         """Elimina una fuente del Diccionario"""
-        if (key,size) not in self._fonts:
+        if key not in self._fonts:
             return
-        self._loaded_paths.pop(self._fonts[(key,size)]["path"], None)
-        self._fonts.pop((key,size))
+        self._loaded_paths.pop(self._fonts[key]["path"], None)
+        self._fonts.pop(key)
 
     def unload_spritesheet(self, key: str) -> None:
         """Elimina una imagen del Diccionario"""

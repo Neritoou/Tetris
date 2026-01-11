@@ -1,0 +1,32 @@
+{
+    "general": {
+        "starting_level": 1,
+        "lines_per_level": 3,
+        "bag_size": 2,
+        "base_fall_delay": 1.0,
+        "fall_multiplier": 0.88,
+        "min_fall_delay": 0.05,
+        "lock_delay": 0.8
+    },
+    "score": {
+        "soft_drop": 1,
+        "hard_drop": 2,
+        "combo_bonus": 50,
+        "back_to_back_multiplier": 1.5
+    },
+    "normal": {
+        "1": 100,
+        "2": 300,
+        "3": 500,
+        "4": 800
+    },
+    "t_spin": {
+        "1": 200,
+        "2": 400,
+        "3": 1600
+    },
+    "mini_t_spin": {
+        "1": 200,
+        "2": 400
+    }
+}

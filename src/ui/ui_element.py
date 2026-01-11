@@ -1,118 +1,133 @@
 from abc import ABC, abstractmethod
+from typing import Tuple, Union
 import pygame
-from typing import Tuple
 
 class UIElement(ABC):
     """Clase base abstracta para todos los elementos de la interfaz de usuario."""
-    def __init__(self, name: str,
-        surface: pygame.Surface, position: Tuple[int, int], *,
-        copy_surface: bool = False, scale: float = 1.0,
-        visible: bool = True, enabled: bool = True,
-    ):
+    def __init__(
+            self, name: str, x: int, y: int, width: int, height: int, *,
+            visible: bool, enabled: bool, alpha: int = 255, scale: float = 1.0,
+            angle: int = 0):
         """
         Inicializa las propiedades comunes de los elementos UI.
         
         Args:
-            name (str): El nombre del elemento UI.
-            surface (pygame.Surface): La superficie del recurso gráfico del elemento.
-            position (Tuple[int, int]): La posición en la pantalla (x, y).
-            copy_surface (bool): Si True, se hará una copia de la superficie para no compartirla con otros elementos.
-            scale (float): Factor de escala para el tamaño del elemento.
-            visible (bool): Si el elemento es visible en pantalla.
-            enabled (bool): Si el elemento está habilitado para interacción.
+            name: Nombre del elemento UI.
+            x: Posición horizontal inicial.
+            y: Posición vertical inical.
+            width: Ancho en píxeles.
+            height: Alto en píxeles.
+            visible: Si el elemento es visible en pantalla.
+            enabled: Si el elemento está habilitado para interacción.
+            alpha: Transparencia de la imagen.
+            scale: Escala (tamaño) de la imagen.
+            angle: Ángulo de la imagen.
         """
-        self._name: str = name
-        self._base_surface: pygame.Surface = surface
-        self._scale: float = scale
-        self._surface: pygame.Surface = self.__build_surface(copy_surface)
-        self._rect: pygame.Rect = self._surface.get_rect(topleft=position)
+        self.name = name
 
-        self._surf_copied: bool = copy_surface
-        self._visible: bool = visible
-        self._enabled: bool = enabled
+        # Posición y dimensiones
+        self.rect = pygame.Rect(x, y, width, height)
+
+        # Estados de visibilidad y accesibilidad
+        self.visible = visible
+        self.enabled = enabled
+
+        # Transformaciones
+        self.alpha: float = float(alpha)
+        self.scale = scale
+        self.angle = angle
+
+        self.target_alpha: float = self.alpha
+        self.fade_speed: float = 0.0
+
+        # Atributos privados
+        self._is_fading: bool = False
 
     @property
     def position(self) -> Tuple[int, int]:
-        """Obtiene la posición del elemento UI (esquinas superiores izquierda)."""
-        return self._rect.topleft
+        """Obtiene la posición del elemento UI (esquina superior izquierda)."""
+        return self.rect.topleft
+
+    @position.setter
+    def position(self, pos: Tuple[int, int]) -> None:
+        self.rect.topleft = pos
 
     @property
-    def scale(self) -> float:
-        """Obtiene el factor de escala actual del elemento."""
-        return self._scale
-    
-    def is_visible(self) -> bool:
-        """Devuelve si el elemento es visible."""
-        return self._visible
-    
-    def is_enabled(self) -> bool:
-        """Devuelve si el elemento está habilitado para la interacción."""
-        return self._enabled
+    def is_fading(self) -> bool:
+        """Devuelve True si el elemento está actualmente en una transición de alpha."""
+        return self._is_fading
 
-    def set_visible(self, visible: bool) -> None:
-        """Actualiza la visibilidad del elemento UI."""
-        self._visible = visible
+    def center_on_screen(self, screen_width: int, screen_height: int) -> None:
+        """Centra el elemento en las dimensiones de pantalla proporcionadas."""
+        self.rect.center = (screen_width // 2, screen_height // 2)
 
-    def set_enabled(self, enabled: bool) -> None:
-        """Actualiza si el elemento está habilitado para la interacción."""
-        self._enabled = enabled
-
-    def set_position(self, position: Tuple[int, int]) -> None:
-        """Actualiza la posición del elemento UI en la pantalla."""
-        self._rect.topleft = position
-
-    def set_scale(self, scale: float) -> None:
+    def fade_to(self, target: int, duration: float) -> None:
         """
-        Actualiza la escala de la surface y ajusta el rect en consecuencia.
-        
-        Si el elemento no fue copiado, no se puede cambiar la escala.
+        Cambia la transparencia de la imagen, calculando el tiempo en que se
+        debe aplicar el cambio.
 
         Args:
-            scale (float): El factor de escala.
-            
+            target_alpha: Transparencia objetivo.
+            duration: Duración en la que se desea aplicar la transparencia.
+        
         Raises:
-            ValueError: Si se intenta cambiar la escala de un elemento no copiado o si la escala es negativa.
+            ValueError: Si el valor de target_alpha no entra en el rango 0-255.
         """
-        if not self._surf_copied:
-            raise ValueError(f"UI Element: '{self._name}' no se puede cambiar la escala de un elemento no copiado. "
-                            f"El elemento es único y su tamaño no debe modificarse. "
-                            f"Habilita la copia del recurso si es necesario cambiar la escala.")
-
-        if scale < 0:
-            raise ValueError(f"UI Element: '{self._name}' no puede ser escalado negativamente '{scale}'")
+        # Verifica que el valor del target_alpha sea adecuado
+        if target < 0 or target > 255:
+            raise ValueError(f"UIElement {self.name}: Alpha fuera de rango (0-255)")
         
-        if scale == self._scale:
-            return  
-    
-        old_position = self._rect.topleft 
-        self._scale = scale
-        self._surface = self.__build_surface(copy_surface=True)
-        
-        # Se Actualiza el tamaño del rect para que coincida con la nueva surface
-        self._rect.size = self._surface.get_size()
+        self.target_alpha = float(target)
 
-        # Si la escala no es 1.0, se ajusta la posición para que la relación visual se mantenga
-        if self._scale != 1.0:
-            self._rect.topleft = old_position # Se coloca el rect en la misma posición
+        # Si no hay duración (duration == 0), el cambio se hace de inmediato.
+        if duration <= 0:
+            self.alpha = target
+            self._is_fading = False
+            return
+
+        # Calcula la diferencia entre el target_alpha y el alpha original.
+        diff = abs(self.alpha - self.target_alpha)
+
+        # Calcula cuanto debe ir sumandole al alpha actual
+        # para determinar la velocidad en el que se hace el cambio.
+        if diff > 1:
+            self.fade_speed = diff / duration
+            self._is_fading = True
+        else:
+            self._is_fading = False
 
 
+
+    # --- MÉTODOS ABSTRACTOS ---
     @abstractmethod
     def render(self, surface: pygame.Surface) -> None:
+        """Renderiza el elemento en la superficie destino."""
         pass
 
     @abstractmethod
     def update(self, dt: float) -> None:
-        pass
-
-
-    # --- HELPERS ---
-    def __build_surface(self, copy_surface: bool) -> pygame.Surface:
         """
-        Construye la superficie del elemento, utilizando una copia si es necesario,
-        y aplicando la escala si no es 1.0.
+        Método abstracto para actualizar los elementos, 
+        todas las clases hijas deben implementarlo.
+        
+        Por defecto tiene la lógica para hacer un cambio progresivo del alpha,
+        y aquellos elementos que tengan transparencia deben hacer un 'super().update'.
         """
-        surf = self._base_surface.copy() if copy_surface else self._base_surface
-        if self._scale != 1.0:
-            w, h = surf.get_size()
-            surf = pygame.transform.smoothscale(surf, (int(w * self._scale), int(h * self._scale)))
-        return surf
+        # Lógica para el fading
+        if self.is_fading:
+            # Si el target_alpha es mayor, se suma
+            if self.alpha < self.target_alpha:
+                self.alpha += self.fade_speed * dt
+                # Si se excede el valor objetivo, se fija
+                if self.alpha >= self.target_alpha:
+                    self.alpha = self.target_alpha
+                    self._is_fading = False
+            
+            # Si el target_alpha es menor, se resta
+            else:
+                self.alpha -= self.fade_speed * dt
+
+                # Si se excede el valor objetivo, se fija
+                if self.alpha <= self.target_alpha:
+                    self.alpha = self.target_alpha   
+                    self._is_fading = False     

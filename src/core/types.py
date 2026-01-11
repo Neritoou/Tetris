@@ -8,10 +8,7 @@ class OverlayType(Enum):
     NONE = auto()           # No es overlay, es parte del flujo principal
     SEMITRANSPARENT = auto()  # Overlay que permite renderizar estados debajo
     FULLSCREEN = auto()       # Overlay que ocupa toda la pantalla, no renderiza fondo
-
-
-
-# INFORMACIÓN DE TIPAADO PARA LAS PIEZAS DE TETRIS
+                
 class PieceSurfaces(TypedDict):
     normal: Surface
     placed: Surface
@@ -23,6 +20,7 @@ class BlockSurfaces(TypedDict):
     ghost: Surface
 
 class PieceData(TypedDict):
-    matrices: List[ndarray]
-    surfaces: PieceSurfaces
-    block: BlockSurfaces
+    matrices: List[ndarray] # List de matrices con sus rotaciones correspondientes
+    surfaces: PieceSurfaces # Dic de Surfaces de la pieza en sus diferentes estados
+    block: BlockSurfaces # Dic de Surface del bloque que forma la pieza en sus diferentes estados
+    type: int # Int que identifica el color de la pieza para dibujar la Board

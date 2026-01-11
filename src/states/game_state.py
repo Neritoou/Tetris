@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import List, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from src.core.game import Game
+    from ..core.game import Game
     from ..core import OverlayType
     import pygame
 
@@ -21,7 +21,6 @@ class GameState(ABC):
         """
         self.game = game
 
-    @abstractmethod
     def on_enter(self) -> None:
         """
         Método llamado cuando el estado se entra (cuando el juego cambia a este estado).

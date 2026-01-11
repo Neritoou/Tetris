@@ -1,9 +1,12 @@
 {
     "general": {
         "starting_level": 1,
-        "lines_per_level": 10,
-        "fall_delay": 0.3,
-        "lock_delay": 0.05
+        "lines_per_level": 3,
+        "bag_size": 2,
+        "base_fall_delay": 1.0,
+        "fall_multiplier": 0.88,
+        "min_fall_delay": 0.05,
+        "lock_delay": 0.8
     },
     "score": {
         "soft_drop": 1,
@@ -27,4 +30,4 @@
         "2": 400
     }
   
-}    
+}

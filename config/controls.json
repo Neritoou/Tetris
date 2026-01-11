@@ -4,7 +4,7 @@
             "move_left": ["a", "LEFT"],
             "move_right": ["d", "RIGHT"],
             "move_down": ["s", "DOWN"],
-            "rotate_piece_right": ["w", "UP"],
+            "rotate_piece_right": ["e", "UP"],
             "rotate_piece_left": ["q"],
             "lock_piece": ["SPACE"]
         },

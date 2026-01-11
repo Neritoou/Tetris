@@ -21,7 +21,6 @@ class GameState(ABC):
         """
         self.game = game
 
-    @abstractmethod
     def on_enter(self) -> None:
         """
         Método llamado cuando el estado se entra (cuando el juego cambia a este estado).

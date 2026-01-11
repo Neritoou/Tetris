@@ -2,6 +2,7 @@ from ..core.types import OverlayType
 from typing import TYPE_CHECKING
 from .state_id import StateID
 from .play_state import PlayState
+from .countdown_state import CountdownState
 import pygame
 
 if TYPE_CHECKING:
@@ -18,6 +19,8 @@ class StateManager:
         # El diccionario mapea StateID con las clases correspondientes
         self._state_classes = {
             StateID.PLAY: PlayState,
+            StateID.MENU: PlayState,
+            StateID.COUNTDOWN: CountdownState
         }
 
     @property
@@ -49,19 +52,19 @@ class StateManager:
         new_state = state_class(self.game, **kwargs)
 
         if new_state.overlay_type == OverlayType.NONE and self.stack:
-            self._pop()
+            self.exit_current()
         self._push(new_state)
+    
+    def exit_current(self) -> None:
+        """ Elimina el estado superior y llama a on_exit. """
+        if self.stack:
+            self.current.on_exit()
+            self.stack.pop()
 
     def _push(self, state: "GameState") -> None:
         """ Agrega un estado al stack y llama a on_enter. """
         self.stack.append(state)
         state.on_enter()
-
-    def _pop(self) -> None:
-        """ Elimina el estado superior y llama a on_exit. """
-        if self.stack:
-            self.current.on_exit()
-            self.stack.pop()
 
     def handle_input(self, events: list[pygame.event.Event]) -> None:
         """Solo el estado superior recibe input"""
@@ -98,4 +101,4 @@ class StateManager:
 
     def clear(self) -> None:
         while self.stack:
-            self._pop()
+            self.exit_current()

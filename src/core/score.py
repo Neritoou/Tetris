@@ -1,4 +1,4 @@
-from typing import Dict, Any
+from typing import Dict, Tuple, Any
 import pygame
 
 # (!) NO ES FUNCIONAL AÚN
@@ -113,7 +113,7 @@ class Score:
         self.level = self.lines_cleared_total // self.config["general"]["lines_per_level"] + 1
 
 
-    def debug_draw(self, surface: pygame.Surface, font: pygame.font.Font, pos_x: int = 10, pos_y: int = 10, line_height: int = 25) -> None:
+    def debug_draw(self, surface: pygame.Surface, font: pygame.font.Font, fall: Tuple[float, float], lock: Tuple[float, float], pos_x: int = 10, pos_y: int = 10, line_height: int = 25) -> None:
         """
         Dibuja en la pantalla los valores internos del Score para debug.
 
@@ -131,6 +131,10 @@ class Score:
             f"Back-to-Back: {self.back_to_back_active}",
             f"Level: {self.level}",
             f"Lines Cleared Total: {self.lines_cleared_total}",
+            f"Fall Delay: {fall[0]:.3f}",
+            f"Fall Timer: {fall[1]:.3f}",
+            f"Lock Delay: {lock[0]:.3f}",
+            f"Lock Timer: {lock[1]:.3f}",
             f"", f"", f"CHANGES:",
             f"Previous Soft Drop: {self.debug_soft_drop}",
             f"Previous Hard Drop: {self.debug_hard_drop}",

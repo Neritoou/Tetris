@@ -105,13 +105,16 @@ class Board:
                 return False
             if c < 0 or c >= self.cols: 
                 return False
-            if r >= 0 and self.matrix[r, c]: 
+            if r >= 0  and self.matrix[r, c]: 
                 return False
         return True
     
-    def is_empty(self) -> bool:
-        """Verifica si el tablero está vacío (sin piezas bloqueadas)."""
-        return not np.any(self.matrix)
+    def is_empty(self, check_rows: int = 3) -> bool:
+        """Verifica si las últimas `check_rows` filas del tablero están vacías.
+
+        Con tan solo comprobar las últimas filas es posible conocer si la Board está vacía"""
+        return not np.any(self.matrix[-check_rows:, :])
+
 
 
     # --- HELPERS ---

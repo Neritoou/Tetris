@@ -1,10 +1,10 @@
 from arcade_machine_sdk import json
-from typing import Dict, List, Set, Tuple
+from typing import Dict, List, Set, Tuple, Any
 from ..util.conversors import pygame_key_to_str, str_to_pygame_key
 from ..controller.map_config import KeyMap
 from .base_config import BaseConfig
 
-class InputConfig(BaseConfig):
+class ControlsConfig(BaseConfig):
     """
     Manager responsable de:
     - Cargar el mapeo de teclas desde JSON
@@ -15,13 +15,13 @@ class InputConfig(BaseConfig):
     Esta clase NO es dueña del estado.
     El estado real vive en KeyMapConfig (singleton lógico).
     """
-    def __init__(self, config_path: str):
+    def __init__(self, *, path: str):
         """
         Inicializa el manager y sincroniza el estado desde el JSON.
 
         :param config_path: Ruta al archivo controls.json
         """
-        self.config_path = config_path
+        self.config_path = path
         # Mapeo: context -> action -> set de teclas (pygame.K_*)
         self._key_map: Dict[str, Dict[str, Set[int]]] = KeyMap.get_key_map()
         # Mapeo Inverso: Pygame -> Lista de (context, action)
@@ -30,7 +30,11 @@ class InputConfig(BaseConfig):
         self.load()
 
         super().__init__(data = self._key_map)
+        self._data: Dict[str, Dict[str, Set[int]]] = self._data
 
+    def get_data(self):
+        return self._data
+    
     def get_keys_for_action(self, context: str, action: str) -> List[int]:
         """
         Devuelve las teclas asignadas a una acción.
@@ -50,11 +54,7 @@ class InputConfig(BaseConfig):
         JSON -> validación -> conversión -> estado global
         """
         data = json.load(self.config_path)
-        controls = data.get("controls")
-        if not isinstance(controls, dict):
-            raise ValueError("Input Manager: El JSON debe contener una clave inicial 'controls' con un valor Dict")
-
-        for context, actions in controls.items():
+        for context, actions in data.items():
             if not isinstance(actions, dict):
                 raise ValueError(f"Input Manager: Contexto '{context}' inválido, debe tener un valor Dict")
 
@@ -83,18 +83,16 @@ class InputConfig(BaseConfig):
         
         estado global -> conversión -> JSON
         """
-        json_data = {}
-        json_data["controls"] = {}
+        json_data: Dict[str, Any] = {}
 
         # Modificar solo la sección de "controls" y convertir las teclas
         for context, actions in self._key_map.items():
-            if context not in json_data["controls"]:
-                json_data["controls"][context] = {}
+            if context not in json_data:
+                json_data[context] = {}
             for action, keys in actions.items():
                 # Convertir las teclas de Pygame a nombres legibles
                 readable_keys = [pygame_key_to_str(key) for key in keys]
-                json_data["controls"][context][action] = readable_keys
-
+                json_data[context][action] = readable_keys
         json.save(self.config_path, json_data)
 
 

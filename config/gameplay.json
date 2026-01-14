@@ -1,32 +1,39 @@
 {
     "general": {
-        "starting_level": 1,
-        "lines_per_level": 3,
+        "starting_level": 1, 
+        "lines_per_level": 2,
         "bag_size": 2,
-        "base_fall_delay": 1.0,
-        "fall_multiplier": 0.88,
-        "min_fall_delay": 0.05,
-        "lock_delay": 0.8
+        "preview_count": 5
     },
+
+    "rulesets": {
+        "guideline": {"gravity_type": "exponential", "lock_type": "resettable"},
+        "nes": {"gravity_type": "for_levels", "lock_type": "auto"},
+        "custom": {"gravity_type": "for_levels", "lock_type": "resettable"}
+    },
+
     "score": {
         "soft_drop": 1,
         "hard_drop": 2,
         "combo_bonus": 50,
-        "back_to_back_multiplier": 1.5
+        "back_to_back_multiplier": 1.5,
+        "normal": {"1": 100, "2": 300, "3": 500, "4": 800},
+        "t_spin": {"1": 200, "2": 400, "3": 1600},
+        "mini_t_spin": {"1": 200, "2": 400}
     },
-    "normal": {
-        "1": 100,
-        "2": 300,
-        "3": 500,
-        "4": 800
+
+    "gravity_types": {
+        "exponential": {"base_fall_delay": 1.0, "multiplier": 0.88, "min_delay": 0.05},
+        "fixed": {"fall_delay": 0.8},
+        "for_levels": {"levels": {"1": 0.71,"2": 0.63,"3": 0.55,"4": 0.46,"5": 0.38,"6": 0.3,"7": 0.21,"8": 0.133,"9": 0.1,
+                    "10": 0.083,"13": 0.066,"16": 0.05,"19": 0.0333,"29": 0.0167 }
+        }  
     },
-    "t_spin": {
-        "1": 200,
-        "2": 400,
-        "3": 1600
-    },
-    "mini_t_spin": {
-        "1": 200,
-        "2": 400
+
+    "lock_types": {
+        "auto": {"lock_delay": 0.0},
+        "fixed": {"lock_delay": 0.8},
+        "resettable": {"lock_delay": 0.8, "max_moves": 15},
+        "collision_delay": {"lock_delay": 1}
     }
 }

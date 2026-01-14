@@ -5,7 +5,6 @@ from .state_id import StateID
 from .game_state import GameState
 
 from ..core import OverlayType
-from ..constants import SCREEN_CENTER_W, SCREEN_CENTER_H
 from ..ui import UIManager
 
 if TYPE_CHECKING:
@@ -65,7 +64,9 @@ class MenuState(GameState):
             self.option -= 1
         if self.game.input.is_key_pressed("ui", "select"):
             if self.option % 3 == 0:
-                self.game.state.change(StateID.PLAY)
+                config = self.game.gameplay_config.get_data()
+                ruleset = config["rulesets"]["custom"]
+                self.game.state.change(StateID.PLAY, session_data = config, ruleset = ruleset)
             elif self.option % 3 == 1:
                 print("ESCENA DE CREDITOS")
             elif self.option % 3 == 2:

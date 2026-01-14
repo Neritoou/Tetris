@@ -2,6 +2,7 @@ from ..core.types import OverlayType
 from typing import TYPE_CHECKING
 from .state_id import StateID
 from .play_state import PlayState
+from .menu_state import MenuState
 from .countdown_state import CountdownState
 import pygame
 
@@ -19,7 +20,7 @@ class StateManager:
         # El diccionario mapea StateID con las clases correspondientes
         self._state_classes = {
             StateID.PLAY: PlayState,
-            StateID.MENU: PlayState,
+            StateID.MENU: MenuState,
             StateID.COUNTDOWN: CountdownState
         }
 

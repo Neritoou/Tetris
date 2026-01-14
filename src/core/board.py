@@ -1,11 +1,11 @@
 import pygame
 import numpy as np
-from typing import Dict, Tuple, TYPE_CHECKING
+from typing import Tuple, TYPE_CHECKING
 from ..constants import NUM_TO_PIECE
 
 if TYPE_CHECKING:
     from .piece import Piece
-    from .types import PieceData
+    from .types import PieceDataType
 
 class Board:
     """
@@ -38,7 +38,7 @@ class Board:
         self.cell_width = cell_width
         self.cell_height = cell_height
 
-    def draw(self, surface: pygame.Surface, pieces: "Dict[str, PieceData]") -> None:
+    def draw(self, surface: pygame.Surface, pieces: "PieceDataType") -> None:
         """Dibuja el fondo del tablero, los bloques estáticos y la pieza activa."""
         # Dibuja la Board
         surface.blit(self._surface, self._rect)

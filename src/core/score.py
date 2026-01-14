@@ -1,5 +1,8 @@
-from typing import Dict, Tuple, Any
+from typing import Tuple, TYPE_CHECKING
 import pygame
+
+if TYPE_CHECKING:
+    from ..config import GameplayConfigType
 
 # (!) NO ES FUNCIONAL AÚN
 class Score:
@@ -7,7 +10,7 @@ class Score:
     Calcula y almacena el puntaje del jugador basándose en la configuración
     del gameplay.
     """
-    def __init__(self, gameplay_config: Dict[Any, Any]):
+    def __init__(self, gameplay_config: "GameplayConfigType"):
         """
         :param gameplay_config: Data de GameplayConfig 
         """
@@ -91,17 +94,17 @@ class Score:
 
     def apply_normal(self, lines_cleared: int):
         """Suma puntos por las líneas eliminadas (single, double, triple, tetris, etc.)"""
-        line_score = self.config["normal"][str(lines_cleared)] * lines_cleared * self.level
+        line_score = self.config["score"]["normal"][str(lines_cleared)] * lines_cleared * self.level
         self.aux_score += line_score
 
     def apply_t_spin(self, lines_cleared: int):
         """Suma puntos por T-Spins (normal, single, double, triple)"""
-        spin_score = self.config["t_spin"][str(lines_cleared)] * lines_cleared * self.level
+        spin_score = self.config["score"]["t_spin"][str(lines_cleared)] * lines_cleared * self.level
         self.aux_score += spin_score
 
     def apply_mini_t_spin(self, lines_cleared: int):
         """Suma puntos por Mini T-Spins"""
-        mini_spin_score = self.config["mini_t_spin"][str(lines_cleared)] * lines_cleared * self.level
+        mini_spin_score = self.config["score"]["mini_t_spin"][str(lines_cleared)] * lines_cleared * self.level
         self.aux_score += mini_spin_score
 
     def get_score(self) -> int:

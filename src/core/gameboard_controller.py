@@ -3,33 +3,74 @@ from typing import Tuple, Any, Dict, TYPE_CHECKING
 from ..constants import PIECE_DEFINITIONS, ROWS, COLS, BLOCK_W, BLOCK_H
 from .piece_bag import PieceBag
 from .board import Board
-from .piece_spawner import PieceSpawner
 from .piece import Piece
 from .score import Score
+from .next_piece_preview import PiecesPreview
 
 if TYPE_CHECKING:
-    from .types import PieceData
+    from .types import BoardType, PiecesPreviewType, PieceDataType
+    from ..config import GameplayConfigType
 
 class GameBoardController:
-    def __init__(self, session_config: Dict[Any, Any], pieces: "Dict[str, PieceData]", board: Dict[str, Any]):
+    def __init__(self, 
+                session_config: "GameplayConfigType", 
+                pieces: "PieceDataType", 
+                board: "BoardType",
+                preview: "PiecesPreviewType") -> None:
+        
+        self.data = pieces
         self.score = Score(session_config)
         self.bag = PieceBag(PIECE_DEFINITIONS, session_config["general"]["bag_size"])
-        self.spawner = PieceSpawner(self.bag, pieces)
+        self.pieces_preview = PiecesPreview(
+            data = pieces,
+            bag = self.bag,
+            preview = preview
+        )
         self.board = Board(ROWS, COLS, board["surface"], BLOCK_W, BLOCK_H, board["pos_x"], board["pos_y"])
         self.piece: Piece
+        self.ghost_position: Tuple[int, int]
 
         self.soft_drop: int = 0
         self.hard_drop: int = 0
 
+    def set_preview_count(self, count: int) -> None:
+        """
+        Actualiza dinámicamente la cantidad de piezas que se muestran en la vista previa.
+        Args:
+            count (int): Número positivo de piezas a mostrar en la preview.
+        """
+        self.pieces_preview.count = count
+
     def spawn_piece(self) -> None:
         """Genera y coloca una nueva pieza en el tablero."""
-        self.piece = self.spawner.new_piece()
+        piece_name = self.bag.get_next_piece()
+        piece_data = self.data[piece_name]
+        self.piece = Piece(piece_name, piece_data)
         self.piece.center(self.board.cols, spawn_offset = -2)
+        self.pieces_preview.generate()
 
-    def draw(self, surface: Surface, pieces: "Dict[str, PieceData]") -> None:
+    def draw(self, surface: Surface, pieces: "PieceDataType") -> None:
+        """
+        Dibuja todos los elementos visuales asociados a este tablero de juego.
+
+        El orden de dibujo es el siguiente:
+        1. El tablero (Board).
+        2. La vista previa de las próximas piezas (PiecesPreview).
+        3. La pieza activa y su pieza fantasma (ghost), si existe y no está bloqueada.
+
+        Args:
+            surface (Surface): Superficie principal donde se renderiza el juego.
+            pieces (PieceDataType): Diccionario con los datos gráficos y lógicos
+                de todas las piezas (matrices, surfaces y bloques).
+        """
         # Dibujar la Board
         self.board.draw(surface, pieces) 
         
+        # Dibujar la preview de las próximas piezas
+        for surf, x, y in self.pieces_preview.get():
+            surface.blit(surf, (x, y))
+
+        # Dibujar la Pieza y su Ghost si es posible
         if not hasattr(self, "piece") or self.piece.is_locked():
             return
 
@@ -82,9 +123,13 @@ class GameBoardController:
             return True
         return False
     
-    def try_fall_piece(self) -> bool:
+    def try_fall_piece(self):
         """ Permite que la pieza caiga por gravedad de ser posible."""
-        return self.try_move_piece_to(1, 0)
+        if not hasattr(self, "piece") or self.piece.is_locked():
+            return
+        
+        if self.can_piece_move(1, 0):
+            self.piece.move(1, 0)
 
     def try_soft_drop_piece(self) -> bool:
         """ 
@@ -143,7 +188,7 @@ class GameBoardController:
         self.piece.col = old_col
         return False
 
-    def get_ghost_position(self) -> Tuple[int, int]:
+    def get_ghost_position(self) -> Tuple[int,int]:
         """
         Calcula la fila en la que la pieza debe caer (posición fantasma).
         
@@ -154,9 +199,11 @@ class GameBoardController:
         """ 
         row = self.piece.row
         col = self.piece.col
-
+        distance = 0
         # Mueve la pieza hacia abajo hasta que no pueda caer más
         while self.board.is_valid(self.piece, row + 1, col):
+            distance += 1
             row += 1
 
-        return row, col
+        return (row, col)
+    

@@ -5,7 +5,7 @@ from .piece_bag import PieceBag
 from .board import Board
 from .piece import Piece
 from .score import Score
-from .next_piece_preview import PiecesPreview
+from .pieces_preview import PiecesPreview
 
 if TYPE_CHECKING:
     from .types import BoardType, PiecesPreviewType, PieceDataType

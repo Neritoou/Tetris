@@ -1,4 +1,4 @@
-from typing import TypedDict, Dict
+from typing import TypedDict
 from .gravity_types import GameplayGravityType
 from .lock_types import GameplayLockType
 
@@ -17,13 +17,13 @@ class GameplayScoreType(TypedDict):
     hard_drop: int
     combo_bonus: int
     back_to_back_multiplier: float
-    normal: Dict[str, int]
-    t_spin: Dict[str, int]
-    mini_t_spin: Dict[str, int]
+    normal: dict[str, int]
+    t_spin: dict[str, int]
+    mini_t_spin: dict[str, int]
 
 class GameplayConfigType(TypedDict):
     general: GameplayGeneralType
-    rulesets: Dict[str, GameplayRulesetType]  # Porque puede haber múltiples reglas
+    rulesets: dict[str, GameplayRulesetType]  # Porque puede haber múltiples reglas
     score: GameplayScoreType
     gravity_types: GameplayGravityType
     lock_types: GameplayLockType

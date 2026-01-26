@@ -1,4 +1,4 @@
-from typing import TypedDict, Dict
+from typing import TypedDict
 
 class ExponentialGravityType(TypedDict):
     base_fall_delay: float
@@ -9,7 +9,7 @@ class FixedGravityType(TypedDict):
     fall_delay: float
 
 class ForLevelsGravityType(TypedDict):
-    levels: Dict[str, float]
+    levels: dict[str, float]
 
 class GameplayGravityType(TypedDict):
     exponential: ExponentialGravityType

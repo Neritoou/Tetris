@@ -1,5 +1,5 @@
 import pygame
-from typing import Dict, Tuple, List, TypeVar, TYPE_CHECKING
+from typing import TypeVar, TYPE_CHECKING
 from .spritesheet import SpriteSheet
 from .piece_library import PieceLibrary
 from .loaders import *
@@ -16,13 +16,13 @@ class ResourceManager:
     """Gestor de recursos del juego: imágenes, sonidos, fuentes, spritesheets y piezas."""
     def __init__(self):
         """Inicializa los contenedores de recursos vacíos."""
-        self._images: Dict[str, ImageResource] = {}
-        self._fonts: Dict[str, FontResource] = {}
-        self._sounds: Dict[str, SoundResource] = {}
-        self._spritesheets: Dict[str, SpriteSheetResource] = {}
+        self._images: dict[str, ImageResource] = {}
+        self._fonts: dict[str, FontResource] = {}
+        self._sounds: dict[str, SoundResource] = {}
+        self._spritesheets: dict[str, SpriteSheetResource] = {}
         self._piece_library: PieceLibrary = PieceLibrary()
 
-        self._loaded_paths: Dict[str, str] = {}
+        self._loaded_paths: dict[str, str] = {}
 
 
 
@@ -51,7 +51,7 @@ class ResourceManager:
         """Obtiene una pieza registrada en la biblioteca."""
         return self._piece_library.get_piece(key)
     
-    def get_pieces(self) -> "Dict[str, PieceData]":
+    def get_pieces(self) -> "dict[str, PieceData]":
         return self._piece_library.pieces
     
     
@@ -62,10 +62,8 @@ class ResourceManager:
         # Si el recurso ya existe, no se crea nuevamente
         if key in self._images:
             if self._images[key]["path"] == path:
-                print(" YA SE CARGÓ")
                 return
             raise ValueError(f"Resource Manager: Image '{key}' ya tiene asociado un path distinto: '{self._images[key]['path']}'")
-        
         self._assert_path_unused(path)
         img = pygame.image.load(path)
         self._images[key] = {"path": path, "surface": img.convert_alpha() if img.get_alpha() else img.convert()}
@@ -102,7 +100,7 @@ class ResourceManager:
         self._fonts[key] = {"path": path, "font": {s: pygame.font.Font(path, s) for s in sizes}}
         self._loaded_paths[path] = key
 
-    def load_spritesheet(self, key: str, path: str, frame_size: Tuple[int,int], padding: Tuple[int,int] = (0,0)) -> None:
+    def load_spritesheet(self, key: str, path: str, frame_size: tuple[int,int], padding: tuple[int,int] = (0,0)) -> None:
         """Carga un spritesheet desde disco."""
         # Si el recurso ya existe, no se crea nuevamente
         if key in self._spritesheets:
@@ -164,7 +162,7 @@ class ResourceManager:
 
 
     # --- HELPERS ---
-    def _get_resource(self, container: Dict[K, T], key: K, resource_type: str) -> T:
+    def _get_resource(self, container: dict[K, T], key: K, resource_type: str) -> T:
         """Obtiene un recurso de un diccionario, lanzando KeyError si no existe."""
         if key not in container:
             raise KeyError(f"Resource Manager: {resource_type} '{key}' no está cargado")

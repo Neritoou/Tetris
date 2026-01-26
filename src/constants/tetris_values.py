@@ -61,13 +61,13 @@ PIECE_DEFINITIONS = {
                             [0,0,0]]),
         "spritesheet_col": 5
     },
-    "L": {
+    "J": {
         "matrix": np.array([[1,0,0],
                             [1,1,1],
                             [0,0,0]]),
         "spritesheet_col": 1
     },
-    "J": {
+    "L": {
         "matrix": np.array([[0,0,1],
                             [1,1,1],
                             [0,0,0]]),
@@ -77,9 +77,9 @@ PIECE_DEFINITIONS = {
 
 # Diccionario de mapeo de números a las piezas
 NUM_TO_PIECE = {
-    1: "L",
+    1: "J",
     2: "S",
-    3: "J",
+    3: "L",
     4: "T",
     5: "Z",
     6: "I",

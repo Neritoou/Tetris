@@ -8,11 +8,10 @@ from ..config import *
 class Game(GameBase):
     def __init__(self, metadata: GameMeta) -> None:
         super().__init__(metadata)
-        self.input_config = InputConfig("config/controls.json")
-        self.gameplay_config = BaseConfig(path = "config/gameplay.json")
-        self.gameplay_config = BaseConfig(path = "config/gameplay.json")
+        self.controls_config = ControlsConfig(path="config/controls.json")
+        self.gameplay_config = BaseConfig[GameplayConfigType](path = "config/gameplay.json")
         self.resources: ResourceManager = ResourceManager()
-        self.input: InputManager = InputManager()
+        self.input = InputManager(self.controls_config.data)
         self.state: StateManager = StateManager(self)
 
     def start(self, surface: pygame.Surface):
@@ -20,7 +19,7 @@ class Game(GameBase):
         # Cargar Recursos 
         self.resources.load()
         # Estado inicial       
-        self.state.change(StateID.PLAY, session_data = self.gameplay_config.get_data())
+        self.state.change(StateID.MENU)
 
     def handle_events(self, events: list[pygame.event.Event]) -> None:
         self.input.update(events)

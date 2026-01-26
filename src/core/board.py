@@ -1,11 +1,11 @@
 import pygame
 import numpy as np
-from typing import Dict, Tuple, TYPE_CHECKING
+from typing import TYPE_CHECKING
 from ..constants import NUM_TO_PIECE
 
 if TYPE_CHECKING:
     from .piece import Piece
-    from .types import PieceData
+    from .types import PieceDataType
 
 class Board:
     """
@@ -38,7 +38,7 @@ class Board:
         self.cell_width = cell_width
         self.cell_height = cell_height
 
-    def draw(self, surface: pygame.Surface, pieces: "Dict[str, PieceData]") -> None:
+    def draw(self, surface: pygame.Surface, pieces: "PieceDataType") -> None:
         """Dibuja el fondo del tablero, los bloques estáticos y la pieza activa."""
         # Dibuja la Board
         surface.blit(self._surface, self._rect)
@@ -51,18 +51,15 @@ class Board:
 
                 surface.blit(block_surface, (bx, by))
 
-    def lock_piece(self, current_piece: "Piece | None") -> None:
+    def lock_piece(self, piece: "Piece") -> None:
         """
         Bloquea la pieza actual en el tablero, marcando las celdas que ocupa como ocupadas 
         (con valor 1) en la matriz. Después de bloquearla, la pieza activa se elimina.
         """
-        if not current_piece:
-            return
-        
-        for r, c in current_piece.get_cells():
+        for r, c in piece.get_cells():
             # Verifica que la celda esté dentro del tablero
             if 0 <= r < self.rows and 0 <= c < self.cols: 
-                self.matrix[r, c] = current_piece.type
+                self.matrix[r, c] = piece.type
 
     def clear_lines(self) -> int:
         """
@@ -86,8 +83,7 @@ class Board:
 
         return lines_cleared
     
-    # (?) al spawnear la pieza, no siempre empieza en uan pos posible
-    def is_valid(self, current_piece: "Piece", row: int | None = None, col: int | None = None) -> bool:
+    def is_valid_move(self, piece: "Piece", row: int | None = None, col: int | None = None) -> bool:
         """
         Verifica si la pieza colisiona con los bordes o bloques existentes.
 
@@ -100,12 +96,8 @@ class Board:
             bool: True si la posición está libre, False si no está ocupada o fuera de límites.
 
         """
-        for r, c in current_piece.get_cells(row, col):
-            if r >= self.rows:
-                return False
-            if c < 0 or c >= self.cols: 
-                return False
-            if r >= 0  and self.matrix[r, c]: 
+        for r, c in piece.get_cells(row, col):
+            if r >= self.rows or (c < 0 or c >= self.cols) or (r >= 0  and self.matrix[r, c]):
                 return False
         return True
     
@@ -118,7 +110,7 @@ class Board:
 
 
     # --- HELPERS ---
-    def get_pixels_of_cell(self, row: int, col: int) -> Tuple[int, int]:
+    def get_pixels_of_cell(self, row: int, col: int) -> tuple[int, int]:
         """
         Convierte una posición de celda del tablero (row, col) en coordenadas
         absolutas en píxeles para dibujar la pieza en pantalla.

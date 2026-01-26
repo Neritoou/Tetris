@@ -1,5 +1,4 @@
 import random
-from typing import List
 
 class PieceBag:
     """
@@ -23,7 +22,7 @@ class PieceBag:
         self.__valid_multiplier(multiplier)
         self.multiplier = multiplier
         
-        self.queue: List[str] = []
+        self.queue: list[str] = []
         self.__fill_bag()
 
     def get_next_piece(self) -> str:
@@ -37,7 +36,7 @@ class PieceBag:
         if not self.queue: self.__fill_bag()
         return self.queue.pop(0)
     
-    def peek_next(self, count: int) -> List[str]:
+    def peek_next(self, count: int) -> list[str]:
         """
         Permite previsualizar las próximas piezas sin sacarlas de la cola.
         Args:

@@ -1,7 +1,9 @@
-from .input_config import InputConfig
 from .base_config import BaseConfig
+from .gameplay import GameplayConfigType
+from .controls_config import ControlsConfig
 
 __all__ = [
-    "InputConfig",
-    "BaseConfig"
+    "ControlsConfig",
+    "BaseConfig",
+    "GameplayConfigType"
 ]

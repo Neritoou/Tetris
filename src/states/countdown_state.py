@@ -1,6 +1,5 @@
 import pygame
-import time
-from typing import List, TYPE_CHECKING
+from typing import TYPE_CHECKING
 from ..core import OverlayType
 
 from .game_state import GameState
@@ -25,7 +24,7 @@ class CountdownState(GameState):
     def on_exit(self) -> None:
         self.playstate._start_game()
     
-    def handle_input(self, events: List[pygame.event.Event]) -> None:
+    def handle_input(self, events: list[pygame.event.Event]) -> None:
         pass
 
     def update(self, dt: float) -> None:

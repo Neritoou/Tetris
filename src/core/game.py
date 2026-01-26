@@ -8,10 +8,10 @@ from ..config import *
 class Game(GameBase):
     def __init__(self, metadata: GameMeta) -> None:
         super().__init__(metadata)
-        self.controls_config: ControlsConfig = ControlsConfig(path = "config/controls.json")
-        self.gameplay_config: GameplayConfig = GameplayConfig(path = "config/gameplay.json")
+        self.controls_config = ControlsConfig(path="config/controls.json")
+        self.gameplay_config = BaseConfig[GameplayConfigType](path = "config/gameplay.json")
         self.resources: ResourceManager = ResourceManager()
-        self.input: InputManager = InputManager()
+        self.input = InputManager(self.controls_config.data)
         self.state: StateManager = StateManager(self)
 
     def start(self, surface: pygame.Surface):

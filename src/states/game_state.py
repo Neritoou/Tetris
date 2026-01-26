@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import List, TYPE_CHECKING
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from ..core.game import Game
@@ -37,7 +37,7 @@ class GameState(ABC):
         pass
 
     @abstractmethod
-    def handle_input(self, events: "List[pygame.event.Event]") -> None:
+    def handle_input(self, events: "list[pygame.event.Event]") -> None:
         """
         Método para manejar la entrada del usuario. 
         Los eventos de teclas, ratón, etc., deben ser procesados aquí.

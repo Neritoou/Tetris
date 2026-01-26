@@ -1,6 +1,6 @@
 import pygame
 import numpy as np
-from typing import List, TYPE_CHECKING
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from ..core.types import PieceData, PieceDataType, PieceSurfaces, BlockSurfaces
@@ -60,7 +60,7 @@ class PieceLibrary:
 
 
     # --- HELPERS ---
-    def _generate_rotations(self, matrix) -> List[np.ndarray]:
+    def _generate_rotations(self, matrix) -> list[np.ndarray]:
         """Genera las cuatro rotaciones (0°, 90°, 180°, 270°) de la matriz."""
         rotations = [matrix]
         for _ in range(3):

@@ -1,4 +1,4 @@
-from typing import List, Tuple, TYPE_CHECKING
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from .piece_bag import PieceBag
@@ -27,7 +27,7 @@ class PiecesPreview:
                          for name in data}
 
         # Lista de tuplas (surface, x, y)
-        self._preview_list: "List[Tuple[Surface, int, int]]" = []
+        self._preview_list: "list[tuple[Surface, int, int]]" = []
         # Cuantas Piezas mostrar
         self.count = preview["preview_count"]
         # Generar la vista previa inicial
@@ -48,6 +48,6 @@ class PiecesPreview:
             # Acumular altura para la siguiente pieza
             y += surface.get_height() + self._margin 
             
-    def get(self) -> "List[Tuple[Surface, int, int]]":
+    def get(self) -> "list[tuple[Surface, int, int]]":
         """Devuelve la lista de previsualización (surface, x, y)"""
         return self._preview_list

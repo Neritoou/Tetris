@@ -1,4 +1,4 @@
-from typing import Dict, Type, TYPE_CHECKING
+from typing import Type, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from ...config.gameplay import GameplayRulesetType, GameplayConfigType
@@ -25,13 +25,13 @@ GRAVITY_CONFIG_KEY = "gravity_types"
 LOCK_CONFIG_KEY = "lock_types"
 
 # Strategy maps
-GRAVITY_MAP: "Dict[str, Type[GravityStrategy]]" = {
+GRAVITY_MAP: "dict[str, Type[GravityStrategy]]" = {
     "exponential": ExponentialGravity,
     "fixed": FixedGravity,
     "for_levels": ForLevelsGravity,
 }
 
-LOCK_MAP: "Dict[str, Type[LockStrategy]]" = {
+LOCK_MAP: "dict[str, Type[LockStrategy]]" = {
     "auto": AutoLock,
     "fixed": FixedLock,
     "resettable": ResettableLock,

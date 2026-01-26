@@ -1,11 +1,11 @@
 from abc import ABC, abstractmethod
-from typing import Dict, Any, TYPE_CHECKING
+from typing import Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from ...config.gameplay import AutoLockType, ColissionDelayLockType, FixedLockType, ResettableLockType
     
 class LockStrategy(ABC):
-    def __init__(self, name: str, lock_config: Dict[str, Any]):
+    def __init__(self, name: str, lock_config: dict[str, Any]):
         self.delay: float = lock_config.get("lock_delay", 0.8)
         self.timer: float = 0.0
         self._name: str = name
@@ -15,6 +15,10 @@ class LockStrategy(ABC):
     def name(self) -> str:
         """Nombre de la estrategia"""
         return self._name
+    
+    def reset_timer(self) -> None:
+        """ Establece el contador de bloqueo en 0.0"""
+        self.timer = 0.0
     
     @abstractmethod
     def update(self, dt: float, is_colliding: bool) -> None:
@@ -33,7 +37,7 @@ class LockStrategy(ABC):
 
 class AutoLock(LockStrategy):
     """Lock instantáneo"""
-    def __init__(self, name: str, lock_config: Dict[str, Any]):
+    def __init__(self, name: str, lock_config: dict[str, Any]):
         super().__init__(name, lock_config)
         self._lock_config: "AutoLockType" = self._lock_config
     def update(self, dt: float, is_colliding: bool) -> None:
@@ -48,7 +52,7 @@ class AutoLock(LockStrategy):
 
 class FixedLock(LockStrategy):
     """Lock clásico, con lock_delay"""
-    def __init__(self, name: str, lock_config: Dict[str, Any]):
+    def __init__(self, name: str, lock_config: dict[str, Any]):
         super().__init__(name, lock_config)
         self._lock_config: "FixedLockType" = self._lock_config
 
@@ -68,7 +72,7 @@ class FixedLock(LockStrategy):
 # (!) VER ESTA
 class ResettableLock(LockStrategy):
     """Lock que permite reinicios mientras la pieza se mueve o rota"""
-    def __init__(self, name: str, lock_config: Dict[str, Any]):
+    def __init__(self, name: str, lock_config: dict[str, Any]):
         super().__init__(name, lock_config)
         self._lock_config: "ResettableLockType" = self._lock_config
         self._max_moves: int = self._lock_config["max_moves"]
@@ -92,7 +96,7 @@ class ResettableLock(LockStrategy):
 
 class CollisionDelayLock(LockStrategy):
     """Lock que solo cuenta el temporizador mientras la pieza colisiona"""
-    def __init__(self, name: str, lock_config: Dict[str, Any]):
+    def __init__(self, name: str, lock_config: dict[str, Any]):
         super().__init__(name, lock_config)
         self._lock_config: "ColissionDelayLockType" = self._lock_config
 

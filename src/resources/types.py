@@ -1,4 +1,4 @@
-from typing import TypedDict, Dict
+from typing import TypedDict
 from pygame import Surface
 from pygame.font import Font
 from pygame.mixer import Sound
@@ -10,7 +10,7 @@ class ImageResource(TypedDict):
 
 class FontResource(TypedDict):
     path: str
-    font: Dict[int, Font]
+    font: dict[int, Font]
 
 class SpriteSheetResource(TypedDict):
     path: str

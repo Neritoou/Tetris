@@ -1,4 +1,4 @@
-from typing import Tuple, TYPE_CHECKING
+from typing import TYPE_CHECKING
 import pygame
 
 if TYPE_CHECKING:
@@ -22,12 +22,16 @@ class Score:
         self.level = self.config["general"]["starting_level"]
         self.lines_cleared_total = 0
 
-        self.debug_soft_drop = 0 # (!) QUITAR
-        self.debug_hard_drop = 0 # (!) QUITAR
+        self.soft_drop: int = 0
+        self.prev_soft_drop: int = 0
+
+        self.hard_drop: int = 0
+        self.prev_hard_drop: int = 0
+
         self.debug_lines_cleared = 0 # (!) QUITAR
         self.debug_type_moviment = "" # (!) QUITAR
 
-    def update(self, lines_cleared: int, type: str, soft_drop: int, hard_drop: int):
+    def update(self, lines_cleared: int, type: str):
         """
         Actualiza el puntaje del jugador según:
         - lines_cleared: número de líneas eliminadas
@@ -35,13 +39,17 @@ class Score:
         - soft_drop: filas descendidas con soft drop
         - hard_drop: filas descendidas con hard drop
         """
+        self.prev_soft_drop = self.soft_drop
+        self.prev_hard_drop = self.hard_drop
         self.aux_score = 0 # Resetear el puntaje temporal
-        self.debug_hard_drop = 0 # (!) QUITAR
-        self.debug_soft_drop = 0 # (!) QUITAR
+
         self.debug_type_moviment = type # (!) QUITAR
         self.debug_lines_cleared = lines_cleared  # (!) QUITAR
-        if soft_drop > 0: self.apply_soft_drop(soft_drop)
-        if hard_drop > 0: self.apply_hard_drop(hard_drop)
+
+        if self.soft_drop > 0: self.apply_soft_drop(self.soft_drop)
+        if self.hard_drop > 0: self.apply_hard_drop(self.hard_drop)
+        self.hard_drop = 0
+        self.soft_drop = 0
 
         if lines_cleared:
    
@@ -67,15 +75,13 @@ class Score:
             self.aux_score *= self.config["score"]["back_to_back_multiplier"]
         return self.aux_score
     
-    def apply_soft_drop(self, lines_dropped: int = 1):
+    def apply_soft_drop(self, lines_dropped: int):
         """Suma puntos por soft drop"""
         self.aux_score += self.config["score"]["soft_drop"] * lines_dropped
-        self.debug_soft_drop =  self.config["score"]["soft_drop"] * lines_dropped # (!) QUITAR
 
     def apply_hard_drop(self, lines_dropped: int):
         """Suma puntos por hard drop"""
         self.aux_score += self.config["score"]["hard_drop"] * lines_dropped
-        self.debug_hard_drop = self.config["score"]["hard_drop"] * lines_dropped # (!) QUITAR
 
     def apply_lines_cleared(self, lines_cleared: int, type: str):
         """
@@ -116,7 +122,7 @@ class Score:
         self.level = self.lines_cleared_total // self.config["general"]["lines_per_level"] + 1
 
 
-    def debug_draw(self, surface: pygame.Surface, font: pygame.font.Font, fall: Tuple[float, float], lock: Tuple[float, float], pos_x: int = 10, pos_y: int = 10, line_height: int = 25) -> None:
+    def debug_draw(self, surface: pygame.Surface, font: pygame.font.Font, fall: tuple[float, float], lock: tuple[float, float], pos_x: int = 10, pos_y: int = 10, line_height: int = 25) -> None:
         """
         Dibuja en la pantalla los valores internos del Score para debug.
 
@@ -139,8 +145,8 @@ class Score:
             f"Lock Delay: {lock[0]:.3f}",
             f"Lock Timer: {lock[1]:.3f}",
             f"", f"", f"CHANGES:",
-            f"Previous Soft Drop: {self.debug_soft_drop}",
-            f"Previous Hard Drop: {self.debug_hard_drop}",
+            f"Previous Soft Drop: {self.prev_soft_drop} x{self.config['score']['soft_drop']} ({self.prev_soft_drop * self.config['score']['soft_drop']})",
+            f"Previous Hard Drop: {self.prev_hard_drop} x{self.config['score']['hard_drop']} ({self.prev_hard_drop * self.config['score']['hard_drop']})",
             f"Previous Lines Cleared: {self.debug_lines_cleared}",
             f"Previous Type Moviment {self.debug_type_moviment}"
         ]

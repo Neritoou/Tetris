@@ -85,10 +85,10 @@ class InputManager:
         self._mapper.assert_action(context, action)
         return self._actions.is_pressed((context, action))
     
-    def is_action_held(self, context: str, action: str) -> bool:
+    def is_action_held(self, context: str, action: str, window: int = 10) -> bool:
         """Verifica si una acción está siendo mantenida."""
         self._mapper.assert_action(context, action)
-        return self._actions.is_held((context, action))
+        return self._actions.is_held((context, action), window)
     
     def is_action_released(self, context: str, action: str) -> bool:
         """Verifica si una acción fue liberada este frame."""
@@ -105,9 +105,9 @@ class InputManager:
         """Verifica si un botón del mouse fue presionado."""
         return self._mouse.is_pressed(MouseButton.from_name(button))
     
-    def is_mouse_held(self, button: str) -> bool:
+    def is_mouse_held(self, button: str, window: int = 10) -> bool:
         """Verifica si un botón del mouse está siendo mantenido."""
-        return self._mouse.is_held(MouseButton.from_name(button))
+        return self._mouse.is_held(MouseButton.from_name(button), window)
     
     def is_mouse_released(self, button: str) -> bool:
         """Verifica si un botón del mouse fue liberado."""
@@ -121,9 +121,9 @@ class InputManager:
         """Verifica si un botón fue presionado dentro de un rectángulo."""
         return self.is_mouse_pressed(button) and self.is_mouse_in_rect(rect)
     
-    def is_mouse_held_in_rect(self, button: str, rect: pygame.Rect) -> bool:
+    def is_mouse_held_in_rect(self, button: str, rect: pygame.Rect, window: int = 10) -> bool:
         """Verifica si un botón está siendo mantenido dentro de un rectángulo."""
-        return self._mouse.is_held(MouseButton.from_name(button)) and self.is_mouse_in_rect(rect)
+        return self._mouse.is_held(MouseButton.from_name(button), window) and self.is_mouse_in_rect(rect)
 
     def is_released_in_rect(self, button: str, rect: pygame.Rect) -> bool:
         """Verifica si un botón ha sido liberado dentro de un rectángulo."""
@@ -134,9 +134,9 @@ class InputManager:
         """Verifica si una tecla física fue presionada."""
         return self._keys.is_pressed(pygame_key)
     
-    def is_key_held(self, pygame_key: int) -> bool:
+    def is_key_held(self, pygame_key: int, window: int = 10) -> bool:
         """Verifica si una tecla física está siendo mantenida."""
-        return self._keys.is_held(pygame_key)
+        return self._keys.is_held(pygame_key, window)
     
     def is_key_released(self, pygame_key: int) -> bool:
         """Verifica si una tecla física fue liberada este frame."""

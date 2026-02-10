@@ -5,7 +5,7 @@ from ...ui import UIElement
 ColorValue = Union[pygame.Color, Tuple[int, int, int], str]
 
 class UILabel(UIElement):
-    """Representa una etiquetaa de texto en la interzas de usuario."""
+    """Representa una etiqueta de texto en la interfaz de usuario."""
     def __init__(self, name: str, x: int, y: int,
                  text: str, font: pygame.font.Font,
                  color: ColorValue = (255, 255, 255), *,
@@ -56,9 +56,9 @@ class UILabel(UIElement):
         pos = self.rect.topleft
         self.rect = self.text_surface.get_rect(topleft=pos)
 
-    def center_at(self, x: int, y: int) -> None:
-        """Posiciona el texto centrándolo en las coordenadas dadas."""
-        self.rect.center = (x, y)
+    def center_at(self, x: int) -> None:
+        """Posiciona el texto centrándolo horizontalmente."""
+        self.rect.centerx = x
 
 
 

@@ -1,5 +1,6 @@
-from typing import cast, Any, Hashable, TypeVar, Generic
-from arcade_machine_sdk import json
+from typing import Any, Hashable, TypeVar, Generic
+import json
+from pathlib import Path
 from copy import deepcopy
 
 T = TypeVar('T')
@@ -21,8 +22,9 @@ class BaseConfig(Generic[T]):
         """
         if path and data is not None:
             raise ValueError("BaseConfig: no puedes proporcionar 'path' y 'data' simultáneamente")
+
         if path:
-            self._data: T = cast(T, json.load(path))
+            self._data: T = self._load_json(path)
         elif data is not None:
             self._data: T = deepcopy(data) # Evita modificar el diccionario original
         else:
@@ -30,6 +32,25 @@ class BaseConfig(Generic[T]):
   
         self._buffer: T = deepcopy(self._data)  # Buffer temporal
         self._modified_keys: set[tuple[Hashable, ...]]= set()  # Claves modificadas
+
+    def _load_json(self, path: str) -> T:
+        """Carga un archivo JSON y devuelve un diccionario."""
+        path_obj = Path(path)
+
+        if not path_obj.exists():
+            raise FileNotFoundError(f"Config no encontrada: {path}")
+
+        with path_obj.open("r", encoding="utf-8") as f:
+            data = json.load(f)
+
+        return data 
+
+    def save(self, path: str, data: T) -> None:
+        """Guarda un diccionario como un archivo JSON."""
+        path_obj = Path(path)
+
+        with path_obj.open("w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=4)
 
     def _navigate_to_parent(self, data: Any, keys: tuple[Hashable, ...]) -> Any:
         """
@@ -112,13 +133,6 @@ class BaseConfig(Generic[T]):
         """Descarta todos los cambios pendientes, restaurando desde los datos originales."""
         self._buffer = deepcopy(self._data)
         self._modified_keys.clear()
-
-    def save(self, path: str) -> None:
-        """Guarda los datos originales (con cambios aplicados) en un archivo JSON."""
-        if not path:
-            raise ValueError("BaseConfig: no hay ruta de archivo disponible para guardar")
-        
-        json.save(path, cast(dict[str,Any], self._data))
 
     # (?) VER SI SE MODIFICA ESTA FORMA DE ACCESO
     @property

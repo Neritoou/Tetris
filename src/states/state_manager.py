@@ -1,6 +1,5 @@
-from ..core.types import OverlayType
 from typing import Type, TYPE_CHECKING
-from .state_id import StateID
+from .types import StateID, OverlayType
 from .play_state import PlayState
 from .menu_state import MenuState
 from .countdown_state import CountdownState

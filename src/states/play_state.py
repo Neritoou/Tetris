@@ -1,9 +1,9 @@
 import pygame
 from typing import TYPE_CHECKING
 from .game_state import GameState
-from ..core import OverlayType, GameBoardController
+from ..core import GameBoardController
 from ..constants import BOARD_X, BOARD_Y
-from .state_id import StateID
+from .types import StateID, OverlayType
 
 if TYPE_CHECKING:
     from src.core.game import Game

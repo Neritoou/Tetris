@@ -10,6 +10,7 @@
     "ui": {
         "select": ["RETURN"],
         "down": ["s", "DOWN"],
-        "up": ["w", "UP"]
+        "up": ["w", "UP"],
+        "pause": ["p", "ESCAPE"]
     }
 }

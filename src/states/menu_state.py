@@ -1,11 +1,10 @@
 import pygame
 from typing import TYPE_CHECKING
 
-from .state_id import StateID
+from .types import StateID, OverlayType
 from .game_state import GameState
 
 from ..constants import SCREEN_CENTER_W
-from ..core import OverlayType
 from ..ui import UIManager, UIMenu, UILabel
 
 if TYPE_CHECKING:
@@ -22,15 +21,14 @@ class MenuState(GameState):
             ("SALIR", self._on_exit)
         ]
 
-        self.font1 = self.game.resources.get_font("Estandar", 150)
-        self.font2 = self.game.resources.get_font("Estandar", 48)
+        font_title = self.game.resources.get_font("Estandar", 150)
+        font_menu = self.game.resources.get_font("Estandar", 48)
 
-        self.title = UILabel("game_title", SCREEN_CENTER_W, 120, "TETRIS", self.font1, (50, 205, 50))
-        self.title.center_at(SCREEN_CENTER_W)
+        self.title = UILabel("game_title", SCREEN_CENTER_W, 120, "TETRIS", font_title, (50, 205, 50))
 
         self.menu = UIMenu(
             "main_menu", SCREEN_CENTER_W, 360, options_list,
-            self.font2, spacing=80, center_text=True
+            font_menu, spacing=80, center_text=True
             )
         
         self.ui: UIManager = UIManager()
@@ -51,14 +49,11 @@ class MenuState(GameState):
         self.ui.render(surface)
 
     def handle_input(self, events: list[pygame.event.Event]) -> None:
-        if not self.menu.enabled:
-            return
-
         if self.game.input.is_action_pressed("ui", "up"):
             self.menu.move_up()
-        if self.game.input.is_action_pressed("ui", "down"):
+        elif self.game.input.is_action_pressed("ui", "down"):
             self.menu.move_down()
-        if self.game.input.is_action_pressed("ui", "select"):
+        elif self.game.input.is_action_pressed("ui", "select"):
             self.menu.execute_selected()
             
     
@@ -72,8 +67,9 @@ class MenuState(GameState):
     
 
 
-    # Callbacks
+    # --- Callbacks ---
     def _on_play(self):
+        """Inicia una partida."""
         config = self.game.gameplay_config.data
         ruleset = config["rulesets"]["custom"]
 
@@ -86,4 +82,5 @@ class MenuState(GameState):
         print("ESCENA DE CREDITOS")
     
     def _on_exit(self):
+        """Detiene y cierra la ventana del juego."""
         self.game.stop()

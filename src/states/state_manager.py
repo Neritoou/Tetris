@@ -1,8 +1,10 @@
 from typing import Type, TYPE_CHECKING
 from .types import StateID, OverlayType
-from .play_state import PlayState
 from .menu_state import MenuState
 from .countdown_state import CountdownState
+from .play_state import PlayState
+from .pause_state import PauseState
+from .game_over_state import GameOverState
 import pygame
 
 if TYPE_CHECKING:
@@ -18,9 +20,11 @@ class StateManager:
         self.game = game
         # El diccionario mapea StateID con las clases correspondientes
         self._state_classes: dict[StateID, Type["GameState"]] = {
-            StateID.PLAY: PlayState,
             StateID.MENU: MenuState,
-            StateID.COUNTDOWN: CountdownState
+            StateID.COUNTDOWN: CountdownState,
+            StateID.PLAY: PlayState,
+            StateID.PAUSE: PauseState,
+            StateID.GAME_OVER: GameOverState
         }
 
     @property

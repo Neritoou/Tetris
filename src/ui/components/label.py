@@ -8,7 +8,7 @@ class UILabel(UIElement):
     """Representa una etiqueta de texto en la interfaz de usuario."""
     def __init__(self, name: str, x: int, y: int,
                  text: str, font: pygame.font.Font,
-                 color: ColorValue = (255, 255, 255), *,
+                 color: ColorValue = (255, 255, 255), *, center: bool = True,
                  visible: bool = True, alpha: int = 255, scale: float = 1.0,
                  angle: int = 0):
         """
@@ -30,6 +30,9 @@ class UILabel(UIElement):
 
         super().__init__(name, x, y, width, height, visible=visible,
                          enabled=False, alpha=alpha, scale=scale, angle=angle)
+        
+        if center:
+            self.center_at(x)
 
     def set_text(self, new_text: str) -> None:
         """Actualiza el contenido del texto y ajusta el área de colisión."""

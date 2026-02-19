@@ -43,12 +43,12 @@ class UIMenu(UIElement):
 
         for i, option_text in enumerate(option_texts):
             label = UILabel(f"{name}_option_{i}", x, (y + i * spacing),
-                            option_text, font, normal_color, visible=visible)
+                            option_text, font, normal_color, center=center_text)
             self._labels.append(label)
 
         # Cursor de seleccion
         self._marker = UILabel(f"{name}_marker", x - marker_offset, y,
-                               marker, font, selected_color, visible=visible)
+                               marker, font, selected_color, center=False)
 
         # Estado interno
         self._selected_index: int = 0
@@ -61,11 +61,8 @@ class UIMenu(UIElement):
         width = marker_space + max_label_width
         height = len(options) * spacing
 
-        # Centrado horizontal de los textos
+        # Centrado horizontal del cursor
         if center_text:
-            for i, label in enumerate(self._labels):
-                label.center_at(x)
-
             self._marker.center_at(x - max_label_width + marker_offset)
 
         super().__init__(name, x, y, width, height, visible=visible, enabled=enabled)

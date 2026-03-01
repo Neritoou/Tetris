@@ -2,8 +2,8 @@ from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from ..core.game import Game
-    from .types import OverlayType
+    from src.core.game import Game
+    from src.states.types import OverlayType
     import pygame
 
 class GameState(ABC):

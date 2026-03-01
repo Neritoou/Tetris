@@ -1,9 +1,9 @@
-from ...constants import PIECE_DEFINITIONS
+from src.constants import PIECE_DEFINITIONS
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from ..piece_library import PieceSurfaces
-    from ..resource_manager import ResourceManager
+    from src.resources.piece_library import PieceSurfaces
+    from src.resources.resource_manager import ResourceManager
     
 def _load_pieces(rm: "ResourceManager") -> None:
     """Registra las piezas del Tetris usando la constante PIECE_DEFINITIONS."""

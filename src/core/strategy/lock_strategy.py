@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from ...config.gameplay import AutoLockType, ColissionDelayLockType, FixedLockType, ResettableLockType
+    from config.gameplay import AutoLockType, ColissionDelayLockType, FixedLockType, ResettableLockType
     
 class LockStrategy(ABC):
     def __init__(self, name: str, lock_config: dict[str, Any]):

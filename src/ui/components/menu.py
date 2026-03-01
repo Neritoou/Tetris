@@ -1,9 +1,9 @@
 import pygame
 from typing import Tuple, List, Callable, TYPE_CHECKING
-from ...ui import UIElement
+from src.ui import UIElement
 
 
-from ..components import UILabel
+from src.ui.components import UILabel
 
 class UIMenu(UIElement):
     """

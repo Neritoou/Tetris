@@ -1,15 +1,15 @@
 from typing import Type, TYPE_CHECKING
-from .types import StateID, OverlayType
-from .menu_state import MenuState
-from .countdown_state import CountdownState
-from .play_state import PlayState
-from .pause_state import PauseState
-from .game_over_state import GameOverState
+from src.states.types import StateID, OverlayType
+from src.states.menu_state import MenuState
+from src.states.countdown_state import CountdownState
+from src.states.play_state import PlayState
+from src.states.pause_state import PauseState
+from src.states.game_over_state import GameOverState
 import pygame
 
 if TYPE_CHECKING:
-    from ..core.game import Game
-    from .game_state import GameState
+    from core.game import Game
+    from game_state import GameState
 
 class StateManager:
     """

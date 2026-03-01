@@ -2,7 +2,7 @@ from typing import TYPE_CHECKING
 import pygame
 
 if TYPE_CHECKING:
-    from ..config import GameplayConfigType
+    from src.config import GameplayConfigType
 
 # (!) NO ES FUNCIONAL AÚN
 class Score:

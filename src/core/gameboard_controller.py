@@ -1,18 +1,18 @@
 from pygame import Surface
 from typing import TYPE_CHECKING
-from ..constants import PIECE_DEFINITIONS, ROWS, COLS, BLOCK_W, BLOCK_H
-from .piece_bag import PieceBag
-from .board import Board
-from .piece import Piece
-from .score import Score
-from .pieces_preview import PiecesPreview
-from .strategy import create_gravity, create_lock
+from src.constants import PIECE_DEFINITIONS, ROWS, COLS, BLOCK_W, BLOCK_H
+from src.core.piece_bag import PieceBag
+from src.core.board import Board
+from src.core.piece import Piece
+from src.core.score import Score
+from src.core.pieces_preview import PiecesPreview
+from src.core.strategy import create_gravity, create_lock
 
 if TYPE_CHECKING:
-    from .types import BoardType, PiecesPreviewType, PieceDataType
-    from ..config.gameplay import GameplayRulesetType
-    from ..config import GameplayConfigType
-    from .strategy import GravityStrategy, LockStrategy
+    from src.core.types import BoardType, PiecesPreviewType, PieceDataType
+    from config.gameplay import GameplayRulesetType
+    from src.config import GameplayConfigType
+    from strategy import GravityStrategy, LockStrategy
 
 class GameBoardController:
     def __init__(self, 

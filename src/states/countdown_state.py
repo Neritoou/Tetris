@@ -1,12 +1,12 @@
 import pygame
 from typing import TYPE_CHECKING
-from .types import OverlayType
+from src.states.types import OverlayType
 
-from .game_state import GameState
+from src.states.game_state import GameState
 
 if TYPE_CHECKING:
     from src.core.game import Game
-    from .play_state import PlayState
+    from src.states.play_state import PlayState
 
 class CountdownState(GameState):
     """

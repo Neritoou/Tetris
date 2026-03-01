@@ -22,8 +22,8 @@ class PauseState(GameState):
         options = [
             ("CONTINUAR", self._on_resume),
             ("REINICIAR", self._on_restart),
-            ("VOLVER AL MENU", self._on_options),
-            ("OPCIONES", self._on_menu)
+            ("VOLVER AL MENU", self._on_menu),
+            ("OPCIONES", self._on_options)
         ]
         
         self.menu = UIMenu("pause_menu", SCREEN_CENTER_W, 350,

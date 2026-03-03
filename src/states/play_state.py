@@ -1,14 +1,14 @@
 import pygame
 from typing import TYPE_CHECKING
-from .game_state import GameState
-from ..core import GameBoardController
-from ..constants import BOARD_X, BOARD_Y
-from .types import StateID, OverlayType
+from src.states.game_state import GameState
+from src.core import GameBoardController
+from src.constants import BOARD_X, BOARD_Y
+from src.states.types import StateID, OverlayType
 
 if TYPE_CHECKING:
     from src.core.game import Game
-    from ..core.types import PieceDataType, BoardType, PiecesPreviewType
-    from ..config.gameplay import GameplayConfigType, GameplayRulesetType
+    from src.core.types import PieceDataType, BoardType, PiecesPreviewType
+    from src.config.gameplay import GameplayConfigType, GameplayRulesetType
 
 class PlayState(GameState):
     """
@@ -28,8 +28,6 @@ class PlayState(GameState):
         self.font = pygame.font.SysFont("Consolas", 20)
         self.pieces: "PieceDataType" 
         self.session: GameBoardController
-
-        #self.next_pieces = [] # (!) Ver que se hará con esto
     
     def on_enter(self) -> None:
         self.pieces =  self.game.resources.get_pieces()
@@ -73,6 +71,10 @@ class PlayState(GameState):
         if self.game.input.is_action_pressed("play", "hard_drop"):
             self.session.try_hard_drop_piece()
             self.session.resolve_piece_lock()
+
+        if self.game.input.is_action_pressed("ui", "pause"):
+            self.game.state.change(StateID.PAUSE)
+            return
     
     def render(self, surface: pygame.Surface) -> None:
         surface.fill((30, 30, 30))
@@ -84,17 +86,20 @@ class PlayState(GameState):
             return
         
         self.session.update(dt)
-    
-    # (!) VER COMO SE ADAPTARÁ SEGÚN EL STATE GAME OVER
-    @property
-    def game_over(self) -> bool:
-        """Verifica si la pieza recién generada colisiona de inmediato."""
-        return self.session.is_game_over()
+
+        if self.game_over:
+            final_score = self.session.score.current_score
+            self.game.state.change(StateID.GAME_OVER, final_score=final_score)
     
     def _start_game(self):
         self._started = True
         self.session.start()
-      
+
+
+    @property
+    def game_over(self) -> bool:
+        """Verifica si la pieza recién generada colisiona de inmediato."""
+        return self.session.is_game_over()
 
     @property
     def overlay_type(self) -> OverlayType:

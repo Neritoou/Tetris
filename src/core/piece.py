@@ -1,8 +1,7 @@
 import pygame
 import numpy as np
-from ..constants import BLOCK_W, BLOCK_H, WALL_KICKS
-
-from .types import PieceData
+from src.constants import BLOCK_W, BLOCK_H, WALL_KICKS
+from src.core.types import PieceData
 
 class Piece:
     """

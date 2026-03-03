@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from ...config.gameplay import ExponentialGravityType, FixedGravityType, ForLevelsGravityType
+    from config.gameplay import ExponentialGravityType, FixedGravityType, ForLevelsGravityType
 
 class GravityStrategy(ABC):
     def __init__(self, name: str, gravity_config: dict[str, Any]):

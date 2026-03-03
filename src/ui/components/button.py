@@ -1,12 +1,10 @@
 import pygame
-from typing import List, Optional, Callable, TYPE_CHECKING
+from typing import Optional, Callable, TYPE_CHECKING
 
-from pygame.event import Event
-
-from ...ui import UIElement
+from src.ui import UIElement
 
 if TYPE_CHECKING:
-    from ..components import UILabel
+    from components import UILabel
 
 class UIButton(UIElement):
     """
@@ -34,8 +32,8 @@ class UIButton(UIElement):
         """
         # Estados del botón (normal, hover, press)
         self.button_surface = base_button
-        self.hover_surface = hover_button
-        self.press_surface = press_button
+        self.hover_surface = hover_button if hover_button else base_button
+        self.press_surface = press_button if press_button else base_button
 
         self._surface = base_button
         self._function = callback_function
@@ -52,6 +50,8 @@ class UIButton(UIElement):
 
         super().__init__(name, x, y, width, height, visible=visible, enabled=enabled)
 
+        if self._text:
+            self._center_text_on_button()
 
 
     # --- PROPIEDADES PARA ACTUALIZAR EL ESTADO ---
@@ -80,20 +80,20 @@ class UIButton(UIElement):
         if not status:
             self.alpha = 128  # Semitransparente
             self._is_hovered = False
+            self._is_pressed = False
         else:
             self.alpha = 255
 
-    def update_text(self, new_text: str) -> None:
+    def set_text(self, new_text: str) -> None:
         """Actualiza el texto del botón de ser necesario."""
         if self._text:
             self._text.set_text(new_text)
             self._center_text_on_button()
 
-
-
     # --- MÉTODOS ABSTRACTOS DE UIElement ---
     def update(self, dt: float) -> None:
         super().update(dt)
+
         if self.is_pressed and self.press_surface:
             self._surface = self.press_surface
         elif self.is_hovered and self.hover_surface:
@@ -105,7 +105,6 @@ class UIButton(UIElement):
             self._text.alpha = self.alpha
             self._text.visible = self.visible
             self._text.update(dt)
-            self._center_text_on_button()
     
     def render(self, surface: pygame.Surface):
         if not self.visible:
@@ -120,11 +119,12 @@ class UIButton(UIElement):
 
 
     # --- MÉTODOS PRIVADOS ---
-    def _on_click(self) -> None:
+    def on_click(self) -> None:
         """Ejecuta la función callback cuando el botón es presionado."""
-        if self._function:
+        if self.enabled and self._function:
             self._function()
 
     def _center_text_on_button(self) -> None:
+        """Centra el texto sobre el botón."""
         if self._text:
             self._text.rect.center = self.rect.center

@@ -1,12 +1,12 @@
 import pygame
 from typing import TYPE_CHECKING
-from .types import OverlayType
+from src.states.types import OverlayType
 
-from .game_state import GameState
+from src.states.game_state import GameState
 
 if TYPE_CHECKING:
     from src.core.game import Game
-    from .play_state import PlayState
+    from src.states.play_state import PlayState
 
 class CountdownState(GameState):
     """
@@ -40,7 +40,7 @@ class CountdownState(GameState):
         if self.time_left > 0:
                 countdown_text = self.font.render(f"Starting in {str(max(1, int(self.time_left) + 1))}", True, (255, 255, 255))
         else:
-            countdown_text = self.font.render(f"¡GO!", True, (255, 255, 255))
+            countdown_text = self.font.render(f"GO!", True, (255, 255, 255))
         surface.blit(countdown_text, (surface.get_width() // 2 - countdown_text.get_width() // 2, surface.get_height() // 2 - countdown_text.get_height() // 2))
 
     @property

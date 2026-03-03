@@ -1,6 +1,6 @@
 from arcade_machine_sdk import json
-from ..util.conversors import pygame_key_to_str, str_to_pygame_key
-from .base_config import BaseConfig
+from src.util.conversors import pygame_key_to_str, str_to_pygame_key
+from src.config.base_config import BaseConfig
 
 # Formato interno: {"play": {"move_left": {97, 276}}}
 ControlsConfigType = dict[str, dict[str, set[int]]]

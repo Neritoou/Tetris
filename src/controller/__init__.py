@@ -1,3 +1,3 @@
-from .input_manager import InputManager
+from src.controller.input_manager import InputManager
 
 

@@ -1,4 +1,4 @@
-from .ui_element import UIElement
-from .ui_manager import UIManager
+from src.ui.ui_element import UIElement
+from src.ui.ui_manager import UIManager
 
-from .components import UIButton, UIStatic, UILabel
+from src.ui.components import UIButton, UIStatic, UILabel, UIMenu

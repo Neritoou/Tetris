@@ -1,6 +1,6 @@
-from arcade_machine_sdk import json
 from src.util.conversors import pygame_key_to_str, str_to_pygame_key
 from src.config.base_config import BaseConfig
+from copy import deepcopy
 
 # Formato interno: {"play": {"move_left": {97, 276}}}
 ControlsConfigType = dict[str, dict[str, set[int]]]
@@ -25,13 +25,19 @@ class ControlsConfig(BaseConfig[ControlsConfigType]):
         self.max_keys_for_action = max_keys_for_action
         
         # Cargar JSON y convertir
-        raw = json.load(path)
+        raw = self._load_json(path)
         converted = self._convert_from_json(raw)
         
         # Inicializar BaseConfig
         super().__init__(data=converted)
     
-    # --- CONVERSIÓN JSON ↔ INTERNO ---
+    def get_contexts(self) -> list[str]:
+        return list(self._buffer.keys())
+
+    def get_actions(self, context: str) -> list[str]:
+        return list(self._buffer[context].keys())
+    
+    # --- CONVERSIÓN JSON - INTERNO ---
     
     def _convert_from_json(self, raw: dict) -> ControlsConfigType:
         """
@@ -80,11 +86,11 @@ class ControlsConfig(BaseConfig[ControlsConfigType]):
     def apply_changes(self) -> None:
         """Aplica cambios y guarda al JSON."""
         super().apply_changes()
-        json.save(self.path, self._convert_to_json())
+        self.save(self.path, self._convert_to_json())
     
     def reload(self) -> None:
         """Recarga desde el archivo, descartando cambios no guardados."""
-        raw = json.load(self.path)
+        raw = self._load_json(self.path)
         self._data = self._convert_from_json(raw)
-        self._buffer = self._data.copy()
-        self._modified = False
+        self._buffer = deepcopy(self._data)
+        self._modified_keys.clear()

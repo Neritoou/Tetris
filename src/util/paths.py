@@ -3,10 +3,10 @@ from pathlib import Path
 
 # Función para obtener la ruta base del proyecto dependiendo si es un ejecutable o desarrollo
 def get_base_path() -> Path:
-    base_path = getattr(sys, "_MEIPASS", None)
-    if base_path:
-        return Path(base_path)
-    
+    # PyInstaller extrae archivos en _MEIPASS
+    if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
+        return Path(sys._MEIPASS)  # pyright: ignore[reportAttributeAccessIssue]
+
     # game/src/util/paths.py ->  game/
     return Path(__file__).resolve().parents[2]
 
@@ -15,6 +15,13 @@ BASE_PATH = get_base_path()
 
 # Ruta a los assets
 ASSETS_ROOT = BASE_PATH / "assets"
+
+def get_path(*paths: str) -> Path:
+    """Devuelve la ruta absoluta de una dirección como un objeto Path"""
+    path = BASE_PATH.joinpath(*paths)
+    if not path.is_file():
+        raise FileNotFoundError(f"Paths: Archivo {paths[-1]} no encontrado inválido en la Ruta:\n{path}")
+    return path
 
 def get_asset(*paths: str) -> Path:
     """

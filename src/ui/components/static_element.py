@@ -1,6 +1,4 @@
 import pygame
-from typing import Tuple
-
 from src.ui import UIElement
 
 class UIStatic(UIElement):
@@ -27,7 +25,7 @@ class UIStatic(UIElement):
         
         width, height = self.img.get_size()
 
-        super().__init__(name, x, y, width, height, visible=visible, enabled=False,
+        super().__init__(name, x, y, width, height, visible=visible,
                          alpha=alpha, scale=scale, angle=angle)
 
 

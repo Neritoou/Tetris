@@ -1,15 +1,13 @@
-from typing import List
-
 from src.ui import UIElement
 
 class UIManager:
     """Clase que se encarga de administrar todas las elementos de la UI disponibles."""
     def __init__(self) -> None:
         """Inicializa la lista de elementos de la UI."""
-        self.elements: List[UIElement] = []
+        self.elements: list[UIElement] = []
 
     def add_element(self, element: UIElement) -> None:
-        """Agrega elementos de la UI a la lista siempre y cuando sean instancias de la UIElement."""
+        """Agrega elementos de la UI a la lista siempre y cuando sean instancias de UIElement."""
         if not isinstance(element, UIElement):
             raise TypeError(f"UIManager: {element} no es un UIElement válido.")
         
@@ -35,7 +33,7 @@ class UIManager:
     def update(self, dt: float) -> None:
         """Actualiza solo los elementos habilitados."""
         for element in self.elements:
-            if element.enabled:
+            if element.visible:
                 element.update(dt)
 
     def clear(self):

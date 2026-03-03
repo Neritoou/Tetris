@@ -28,4 +28,3 @@ class AudioCategory(Enum):
     """Categorías de audio para control de volumen independiente"""
     MUSIC = "music"
     SFX = "sfx"
-    VOICE = "voice"

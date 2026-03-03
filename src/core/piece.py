@@ -1,9 +1,7 @@
 import pygame
 import numpy as np
-from typing import List, Tuple
-from ..constants import BLOCK_W, BLOCK_H, WALL_KICKS
-
-from .types import PieceData
+from src.constants import BLOCK_W, BLOCK_H, WALL_KICKS
+from src.core.types import PieceData
 
 class Piece:
     """
@@ -27,6 +25,9 @@ class Piece:
         self.row = row
         self.col = col
         self.rot = rot 
+        self.ghost_row = -1
+        self.ghost_col = -1
+        self.ghost_rot = -1
         self.active = True
     
     @property
@@ -50,11 +51,11 @@ class Piece:
         """Cambia el estado de la pieza a activada"""
         self.active = True
     
-    def draw_normal(self, surface: pygame.Surface, position_in_board: Tuple[int, int]) -> None:
+    def draw_normal(self, surface: pygame.Surface, position_in_board: tuple[int, int]) -> None:
         """Dibuja la pieza normal usando su surface de bloque normal."""
         self._draw_blocks(surface, position_in_board, self._data["block"]["normal"])
 
-    def draw_ghost(self, surface: pygame.Surface, position_in_board: Tuple[int, int]) -> None:
+    def draw_ghost(self, surface: pygame.Surface, position_in_board: tuple[int, int]) -> None:
         """Dibuja la pieza fantasma usando su surface de bloque ghost."""
         self._draw_blocks(surface, position_in_board, self._data["block"]["ghost"])
 
@@ -90,7 +91,7 @@ class Piece:
         self.col = (board_cols - matrix_width) // 2
         self.row = spawn_offset
     
-    def get_cells(self, row: int | None = None, col: int | None = None) -> List[Tuple[int, int]]:
+    def get_cells(self, row: int | None = None, col: int | None = None) -> list[tuple[int, int]]:
         """
         Calcula la lista de celdas absolutas (row, col) ocupadas por la pieza en el tablero.
 
@@ -104,7 +105,7 @@ class Piece:
         baserow = self.row if row is None else row
         basecol = self.col if col is None else col
 
-        cells = []
+        cells: list[tuple[int, int]] = []
         for (r,c), block in np.ndenumerate(self.matrix):
             if block: 
                 cells.append((baserow + r, basecol + c))
@@ -139,7 +140,7 @@ class Piece:
 
     
     # --- HELPERS ---
-    def _draw_blocks(self, surface: pygame.Surface, position_in_board: Tuple[int, int], block_surface: pygame.Surface) -> None:
+    def _draw_blocks(self, surface: pygame.Surface, position_in_board: tuple[int, int], block_surface: pygame.Surface) -> None:
         """
         Método interno que dibuja los bloques de la pieza usando la surface indicada.
         """

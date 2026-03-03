@@ -1,10 +1,10 @@
 import pygame
 import numpy as np
-from typing import Dict, List, TYPE_CHECKING
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from ..core.types import PieceData, PieceSurfaces, BlockSurfaces
-
+    from src.core.types import PieceData, PieceDataType, PieceSurfaces, BlockSurfaces
+    
 class PieceLibrary:
     """
     Clase que gestiona todas las piezas del juego, incluyendo sus matrices de rotación
@@ -14,7 +14,7 @@ class PieceLibrary:
     """
     def __init__(self) -> None:
         """Inicializa el registro de piezas vacío."""
-        self._pieces: "Dict[str,PieceData]" = {}
+        self._pieces: "PieceDataType" = {}
 
     # --- MÉTODOS ACCESIBLES ---
     def register_piece(self,name: str, base_matrix: np.ndarray, blocks: "BlockSurfaces", type: int) -> None:
@@ -54,13 +54,13 @@ class PieceLibrary:
         return self._pieces[name]["surfaces"][state]
     
     @property
-    def pieces(self) -> "Dict[str,PieceData]":
+    def pieces(self) -> "PieceDataType":
         return self._pieces
     
 
 
     # --- HELPERS ---
-    def _generate_rotations(self, matrix) -> List[np.ndarray]:
+    def _generate_rotations(self, matrix) -> list[np.ndarray]:
         """Genera las cuatro rotaciones (0°, 90°, 180°, 270°) de la matriz."""
         rotations = [matrix]
         for _ in range(3):
@@ -80,15 +80,33 @@ class PieceLibrary:
         Returns:
             pygame.Surface: Surface completa de la pieza.
         """
-        rows, cols = piece_matrix.shape
+        # Encuentra los índices de las filas y columnas que contienen bloques
+          # Obtener las filas y columnas ocupadas
+        rows, cols = piece_matrix.shape  # Desestructurar las dimensiones
         block_w, block_h = block_image.get_size()
-        piece_surface = pygame.Surface((cols * block_w, rows * block_h), pygame.SRCALPHA)
 
+        # Buscar las filas y columnas ocupadas por bloques (no vacías)
+        occupied_rows = [r for r in range(rows) if np.any(piece_matrix[r, :])]
+        occupied_cols = [c for c in range(cols) if np.any(piece_matrix[:, c])]
+
+        # Si no hay filas ni columnas ocupadas, lanzamos un error
+        if not occupied_rows or not occupied_cols:
+            raise ValueError("Piece Library: No es posible generar una Surface (No se encontraron datos en la matriz).")
+
+        # Calcular las dimensiones reales de la pieza (sin incluir espacios vacíos)
+        height = len(occupied_rows) * block_h
+        width = len(occupied_cols) * block_w
+
+        # Crear la superficie final con el tamaño correcto (ajustado al contenido)
+        piece_surface = pygame.Surface((width, height), pygame.SRCALPHA)
+
+        # Dibujar los bloques en la superficie ajustada
         for (r, c), block in np.ndenumerate(piece_matrix):
-            if not block: continue
-            x = c * block_w
-            y = r * block_h
-            piece_surface.blit(block_image, (x, y))
+            if block:  # Solo dibujar bloques ocupados
+                # Calcular las posiciones ajustadas en la nueva surface
+                x = (c - occupied_cols[0]) * block_w  # Desplazamos para ajustar al inicio
+                y = (r - occupied_rows[0]) * block_h  # Desplazamos para ajustar al inicio
+                piece_surface.blit(block_image, (x, y))  # Colocamos el bloque en la surface
 
         return piece_surface
     

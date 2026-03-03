@@ -1,14 +1,14 @@
 import pygame
 from typing import Tuple, Union
-from ...ui import UIElement
+from src.ui import UIElement
 
 ColorValue = Union[pygame.Color, Tuple[int, int, int], str]
 
 class UILabel(UIElement):
-    """Representa una etiquetaa de texto en la interzas de usuario."""
+    """Representa una etiqueta de texto en la interfaz de usuario."""
     def __init__(self, name: str, x: int, y: int,
                  text: str, font: pygame.font.Font,
-                 color: ColorValue = (255, 255, 255), *,
+                 color: ColorValue = (255, 255, 255), *, center: bool = True,
                  visible: bool = True, alpha: int = 255, scale: float = 1.0,
                  angle: int = 0):
         """
@@ -30,6 +30,9 @@ class UILabel(UIElement):
 
         super().__init__(name, x, y, width, height, visible=visible,
                          enabled=False, alpha=alpha, scale=scale, angle=angle)
+        
+        if center:
+            self.center_at(x)
 
     def set_text(self, new_text: str) -> None:
         """Actualiza el contenido del texto y ajusta el área de colisión."""
@@ -56,9 +59,9 @@ class UILabel(UIElement):
         pos = self.rect.topleft
         self.rect = self.text_surface.get_rect(topleft=pos)
 
-    def center_at(self, x: int, y: int) -> None:
-        """Posiciona el texto centrándolo en las coordenadas dadas."""
-        self.rect.center = (x, y)
+    def center_at(self, x: int) -> None:
+        """Posiciona el texto centrándolo horizontalmente."""
+        self.rect.centerx = x
 
 
 

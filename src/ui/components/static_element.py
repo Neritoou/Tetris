@@ -1,7 +1,7 @@
 import pygame
 from typing import Tuple
 
-from ...ui import UIElement
+from src.ui import UIElement
 
 class UIStatic(UIElement):
     """

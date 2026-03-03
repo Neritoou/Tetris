@@ -1,17 +1,16 @@
 {
-    "controls": {
-        "play": {
-            "move_left": ["a", "LEFT"],
-            "move_right": ["d", "RIGHT"],
-            "move_down": ["s", "DOWN"],
-            "rotate_piece_right": ["e", "UP"],
-            "rotate_piece_left": ["q"],
-            "hard_drop": ["SPACE"]
-        },
-        "ui": {
-            "select": ["RETURN"],
-            "down": ["s", "DOWN"],
-            "up": ["w", "UP"]
-        }
+    "play": {
+        "move_left": ["a", "LEFT"],
+        "move_right": ["d", "RIGHT"],
+        "move_down": ["s", "DOWN"],
+        "rotate_piece_right": ["e", "UP"],
+        "rotate_piece_left": ["q"],
+        "hard_drop": ["SPACE"]
+    },
+    "ui": {
+        "select": ["RETURN"],
+        "down": ["s", "DOWN"],
+        "up": ["w", "UP"],
+        "pause": ["p", "ESCAPE"]
     }
 }

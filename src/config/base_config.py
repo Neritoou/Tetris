@@ -1,38 +1,147 @@
-from typing import Dict, Any
-from arcade_machine_sdk import json
+from typing import Any, Hashable, TypeVar, Generic
+import json
+from pathlib import Path
 from copy import deepcopy
 
-class BaseConfig():
-    def __init__(self, *, path: str = "", data: Dict[Any, Any]= {}):
+T = TypeVar('T')
 
-        if path: self._data = json.load(path)
-        elif data: self._data = data
-        else: raise ValueError(f"BaseConfig: no se implementó ninguna estrategia de inicialización")
+class BaseConfig(Generic[T]):
+    """
+    Clase base para manejar configuraciones.
+    
+    Permite modificar configuraciones sin alterar los datos originales
+    hasta que se apliquen explícitamente.
+    """
+    def __init__(self, *, path: str = "", data: T | None = None):
+        """
+        Inicializa la configuración desde un archivo JSON o un diccionario.
+        
+        Args:
+            path: Ruta al archivo JSON (mutuamente excluyente con data)
+            data: Diccionario con los datos (mutuamente excluyente con path)
+        """
+        if path and data is not None:
+            raise ValueError("BaseConfig: no puedes proporcionar 'path' y 'data' simultáneamente")
+
+        if path:
+            self._data: T = self._load_json(path)
+        elif data is not None:
+            self._data: T = deepcopy(data) # Evita modificar el diccionario original
+        else:
+            raise ValueError("BaseConfig: debes proporcionar 'path' o 'data'")
   
-        self._buffer = deepcopy(self._data)  # Buffer temporal
-        self._modified_keys = set()  # Claves modificadas
+        self._buffer: T = deepcopy(self._data)  # Buffer temporal
+        self._modified_keys: set[tuple[Hashable, ...]]= set()  # Claves modificadas
 
-    # --- Acceso seguro al buffer ---
-    def get(self, key: str) -> Any:
-        """Devuelve el valor del buffer para la clave dada."""
-        return self._buffer.get(key)
+    def _load_json(self, path: str) -> T:
+        """Carga un archivo JSON y devuelve un diccionario."""
+        path_obj = Path(path)
 
-    def set(self, key: str, value: Any) -> None:
-        """Modifica el buffer y marca la clave como modificada automáticamente."""
-        self._buffer[key] = value
-        self._modified_keys.add(key)
+        if not path_obj.exists():
+            raise FileNotFoundError(f"Config no encontrada: {path}")
 
-    def apply_changes(self):
-        """Aplica solo las claves modificadas al data."""
-        for key in self._modified_keys:
-            self._data[key] = self._buffer[key]
+        with path_obj.open("r", encoding="utf-8") as f:
+            data = json.load(f)
+
+        return data 
+
+    def save(self, path: str, data: T) -> None:
+        """Guarda un diccionario como un archivo JSON."""
+        path_obj = Path(path)
+
+        with path_obj.open("w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=4)
+
+    def _navigate_to_parent(self, data: Any, keys: tuple[Hashable, ...]) -> Any:
+        """
+        Navega hasta el contenedor padre (penúltimo nivel).
+        
+        Ejemplo:
+            keys = ("general", "starting_level")
+            
+            Para GET: 
+                parent = _navigate_to_parent(data, keys)
+                value = parent[keys[-1]] 
+            
+            Para SET:
+                parent = _navigate_to_parent(data, keys)
+                parent[keys[-1]] = new_value
+        """
+        if not keys:
+            raise ValueError("BaseConfig: 'keys' debe proporcionar al menos una Key")
+        
+        current = data
+        
+        for key in keys[:-1]:
+            if not isinstance(current, dict):
+                raise TypeError(f"BaseConfig: valor intermedio no es un diccionario")
+            if key not in current:
+                raise KeyError(f"BaseConfig: clave '{key}' no existe")
+            current = current[key]
+        
+        # Verificar que el contenedor final es un dict
+        if not isinstance(current, dict):
+            raise TypeError(f"BaseConfig: el contenedor padre no es un diccionario")
+        
+        return current
+
+    def get(self, *keys: Hashable) -> Any:
+        """Obtiene un valor anidado del buffer."""
+        parent = self._navigate_to_parent(self._buffer, keys)
+        
+        # Verificar que la clave final existe
+        if keys[-1] not in parent:
+            raise KeyError(f"BaseConfig: la clave '{keys[-1]}' no existe")
+        
+        return parent[keys[-1]]
+
+    def set(self, value: Any, *keys: Hashable) -> None:
+        """Establece un valor anidado en el buffer."""
+        parent = self._navigate_to_parent(self._buffer, keys)
+
+        if keys[-1] not in parent:
+            raise KeyError(f"BaseConfig: la clave '{keys[-1]}' no existe en la config original")
+        
+        # Aplicar en buffer y guardar en las keys modificadas
+        parent[keys[-1]] = value
+        self._modified_keys.add(keys)
+        
+    def apply_changes(self) -> None:
+        """
+        Aplica los cambios del buffer a los datos originales.
+        Solo aplica las claves que fueron modificadas.
+        """
+        if not self._modified_keys:
+            return
+            
+        for keys in self._modified_keys:
+            # Navegar a los padres usando la función existente
+            parent_buffer = self._navigate_to_parent(self._buffer, keys)
+            parent_data = self._navigate_to_parent(self._data, keys)
+            
+            # Copiar el valor
+            final_key = keys[-1]
+            parent_data[final_key] = deepcopy(parent_buffer[final_key])
+        
         self._modified_keys.clear()
 
-    def discard_changes(self):
-        """Descarta los cambios en el buffer."""
+    def has_changes(self) -> bool:
+        """Verifica si hay cambios pendientes."""
+        return True if self._modified_keys else False
+    
+    def discard_changes(self) -> None:
+        """Descarta todos los cambios pendientes, restaurando desde los datos originales."""
         self._buffer = deepcopy(self._data)
         self._modified_keys.clear()
 
-    def get_data(self) -> Dict[Any, Any]:
-        """ Retorna el diccionario de datos de la Configuración"""
+    # (?) VER SI SE MODIFICA ESTA FORMA DE ACCESO
+    @property
+    def data(self) -> T:
+        """Retorna los datos originales."""
         return self._data
+    
+    @property
+    def buffer(self) -> T:
+        """Retorna el buffer actual."""
+        return self._buffer
+    

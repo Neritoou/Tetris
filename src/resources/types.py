@@ -1,8 +1,9 @@
-from typing import TypedDict, Dict
+from typing import TypedDict
 from pygame import Surface
 from pygame.font import Font
 from pygame.mixer import Sound
-from .spritesheet import SpriteSheet
+from src.resources.spritesheet import SpriteSheet
+from enum import Enum
 
 class ImageResource(TypedDict):
     path: str
@@ -10,7 +11,7 @@ class ImageResource(TypedDict):
 
 class FontResource(TypedDict):
     path: str
-    font: Dict[int, Font]
+    font: dict[int, Font]
 
 class SpriteSheetResource(TypedDict):
     path: str
@@ -20,4 +21,11 @@ class SoundResource(TypedDict):
     path: str
     sound: Sound
 
+class MusicResource(TypedDict):
+    path: str
 
+class AudioCategory(Enum):
+    """Categorías de audio para control de volumen independiente"""
+    MUSIC = "music"
+    SFX = "sfx"
+    VOICE = "voice"

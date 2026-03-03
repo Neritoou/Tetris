@@ -1,6 +1,6 @@
 from typing import List
 
-from ..ui import UIElement
+from src.ui import UIElement
 
 class UIManager:
     """Clase que se encarga de administrar todas las elementos de la UI disponibles."""

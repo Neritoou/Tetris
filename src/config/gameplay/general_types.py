@@ -1,6 +1,6 @@
 from typing import TypedDict
-from .gravity_types import GameplayGravityType
-from .lock_types import GameplayLockType
+from src.config.gameplay.gravity_types import GameplayGravityType
+from src.config.gameplay.lock_types import GameplayLockType
 
 class GameplayGeneralType(TypedDict):
     starting_level: int

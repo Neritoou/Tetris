@@ -3,8 +3,8 @@ import numpy as np
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from ..core.types import PieceData, PieceDataType, PieceSurfaces, BlockSurfaces
-
+    from src.core.types import PieceData, PieceDataType, PieceSurfaces, BlockSurfaces
+    
 class PieceLibrary:
     """
     Clase que gestiona todas las piezas del juego, incluyendo sus matrices de rotación

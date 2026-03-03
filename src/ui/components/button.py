@@ -1,10 +1,10 @@
 import pygame
 from typing import Optional, Callable, TYPE_CHECKING
 
-from ...ui import UIElement
+from src.ui import UIElement
 
 if TYPE_CHECKING:
-    from ..components import UILabel
+    from components import UILabel
 
 class UIButton(UIElement):
     """

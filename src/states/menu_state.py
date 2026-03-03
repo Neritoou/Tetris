@@ -1,11 +1,11 @@
 import pygame
 from typing import TYPE_CHECKING
 
-from .types import StateID, OverlayType
-from .game_state import GameState
+from src.states.types import StateID, OverlayType
+from src.states.game_state import GameState
 
-from ..constants import SCREEN_CENTER_W
-from ..ui import UIManager, UIMenu, UILabel
+from src.constants import SCREEN_CENTER_W
+from src.ui import UIManager, UIMenu, UILabel
 
 if TYPE_CHECKING:
     from src.core.game import Game

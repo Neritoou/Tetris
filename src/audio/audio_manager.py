@@ -1,9 +1,9 @@
 import pygame
 from typing import Dict, TYPE_CHECKING
-from ..resources.types import AudioCategory
+from src.resources.types import AudioCategory
 
 if TYPE_CHECKING:
-    from ..resources import SoundResource
+    from src.resources import SoundResource
 
 class AudioManager:
     """Gestor global de audio, maneja reproducción y control."""

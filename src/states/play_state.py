@@ -1,14 +1,14 @@
 import pygame
 from typing import TYPE_CHECKING
-from .game_state import GameState
-from ..core import GameBoardController
-from ..constants import BOARD_X, BOARD_Y
-from .types import StateID, OverlayType
+from src.states.game_state import GameState
+from src.core import GameBoardController
+from src.constants import BOARD_X, BOARD_Y
+from src.states.types import StateID, OverlayType
 
 if TYPE_CHECKING:
     from src.core.game import Game
-    from ..core.types import PieceDataType, BoardType, PiecesPreviewType
-    from ..config.gameplay import GameplayConfigType, GameplayRulesetType
+    from src.core.types import PieceDataType, BoardType, PiecesPreviewType
+    from src.config.gameplay import GameplayConfigType, GameplayRulesetType
 
 class PlayState(GameState):
     """

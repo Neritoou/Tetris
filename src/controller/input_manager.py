@@ -1,6 +1,6 @@
-from .input_state import InputState
-from .input_mapper import InputMapper
-from .mouse_button import MouseButton
+from src.controller.input_state import InputState
+from src.controller.input_mapper import InputMapper
+from src.controller.mouse_button import MouseButton
 import pygame
 
 class InputManager:

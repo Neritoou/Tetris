@@ -1,12 +1,12 @@
 import pygame
 from typing import TYPE_CHECKING
-from .game_state import GameState
-from .types import StateID, OverlayType
-from ..constants import SCREEN_CENTER_W
-from ..ui import UIManager, UIMenu, UILabel
+from src.states.game_state import GameState
+from src.states.types import StateID, OverlayType
+from src.constants import SCREEN_CENTER_W
+from src.ui import UIManager, UIMenu, UILabel
 
 if TYPE_CHECKING:
-    from ..core.game import Game
+    from src.core.game import Game
 
 class GameOverState(GameState):
     """Estado de Game Over que se superpone al perder la partida."""

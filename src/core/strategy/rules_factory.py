@@ -1,16 +1,16 @@
 from typing import Type, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from ...config.gameplay import GameplayRulesetType, GameplayConfigType
-    from .gravity_strategy import GravityStrategy
-    from .lock_strategy import LockStrategy
+    from src.config.gameplay import GameplayRulesetType, GameplayConfigType
+    from src.core.strategy.gravity_strategy import GravityStrategy
+    from src.core.strategy.lock_strategy import LockStrategy
 
-from .gravity_strategy import (
+from src.core.strategy.gravity_strategy import (
     ExponentialGravity,
     FixedGravity,
     ForLevelsGravity
 )
-from .lock_strategy import (
+from src.core.strategy.lock_strategy import (
     AutoLock,
     FixedLock,
     ResettableLock,

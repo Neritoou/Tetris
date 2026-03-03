@@ -1,11 +1,11 @@
 import pygame
 import numpy as np
 from typing import TYPE_CHECKING
-from ..constants import NUM_TO_PIECE
+from src.constants import NUM_TO_PIECE
 
 if TYPE_CHECKING:
-    from .piece import Piece
-    from .types import PieceDataType
+    from piece import Piece
+    from src.core.types import PieceDataType
 
 class Board:
     """

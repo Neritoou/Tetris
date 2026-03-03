@@ -1,12 +1,12 @@
 import pygame
 from typing import TYPE_CHECKING
-from .game_state import GameState
-from .types import StateID, OverlayType
-from ..constants import SCREEN_CENTER_W
-from ..ui import UIMenu, UILabel, UIManager
+from src.states.game_state import GameState
+from src.states.types import StateID, OverlayType
+from src.constants import SCREEN_CENTER_W
+from src.ui import UIMenu, UILabel, UIManager
 
 if TYPE_CHECKING:
-    from ..core.game import Game
+    from src.core.game import Game
 
 class PauseState(GameState):
     """Estado de pausa que se superpone al juego."""
@@ -22,8 +22,8 @@ class PauseState(GameState):
         options = [
             ("CONTINUAR", self._on_resume),
             ("REINICIAR", self._on_restart),
-            ("VOLVER AL MENU", self._on_options),
-            ("OPCIONES", self._on_menu)
+            ("VOLVER AL MENU", self._on_menu),
+            ("OPCIONES", self._on_options)
         ]
         
         self.menu = UIMenu("pause_menu", SCREEN_CENTER_W, 350,

@@ -1,14 +1,14 @@
 import pygame
 from typing import TypeVar, TYPE_CHECKING
-from .spritesheet import SpriteSheet
-from .piece_library import PieceLibrary
-from .loaders import *
-from .types import *
+from src.resources.spritesheet import SpriteSheet
+from src.resources.piece_library import PieceLibrary
+from src.resources.loaders import *
+from src.resources.types import *
 
 if TYPE_CHECKING:
     import numpy as np
-    from ..core import PieceSurfaces, PieceData
-    from .types import AudioCategory
+    from src.core.types import PieceSurfaces, PieceData
+    from src.resources.types import AudioCategory
 
 T = TypeVar("T")
 K = TypeVar("K")

@@ -1,10 +1,10 @@
 import pygame
 from arcade_machine_sdk import GameBase, GameMeta
-from ..resources import ResourceManager
-from ..controller import InputManager
-from ..audio import AudioManager
-from ..states import *
-from ..config import *
+from src.resources import ResourceManager
+from src.controller import InputManager
+from src.audio import AudioManager
+from src.states import *
+from src.config import *
 
 class Game(GameBase):
     def __init__(self, metadata: GameMeta) -> None:

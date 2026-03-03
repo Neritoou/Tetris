@@ -2,7 +2,7 @@ from typing import TypedDict
 from pygame import Surface
 from pygame.font import Font
 from pygame.mixer import Sound
-from .spritesheet import SpriteSheet
+from src.resources.spritesheet import SpriteSheet
 from enum import Enum
 
 class ImageResource(TypedDict):

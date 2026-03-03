@@ -1,6 +1,6 @@
 import pygame
 from typing import Tuple, Union
-from ...ui import UIElement
+from src.ui import UIElement
 
 ColorValue = Union[pygame.Color, Tuple[int, int, int], str]
 

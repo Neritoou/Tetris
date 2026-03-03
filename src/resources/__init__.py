@@ -1,7 +1,7 @@
-from .piece_library import PieceLibrary
-from .spritesheet import SpriteSheet
-from .resource_manager import ResourceManager
-from .types import FontResource, SoundResource, ImageResource, SpriteSheetResource
+from src.resources.piece_library import PieceLibrary
+from src.resources.spritesheet import SpriteSheet
+from src.resources.resource_manager import ResourceManager
+from src.resources.types import FontResource, SoundResource, ImageResource, SpriteSheetResource
 
 __all__ = [
     "PieceLibrary",

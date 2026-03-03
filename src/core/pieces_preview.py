@@ -1,8 +1,8 @@
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from .piece_bag import PieceBag
-    from .types import PieceDataType, PiecesPreviewType
+    from src.core.piece_bag import PieceBag
+    from src.core.types import PieceDataType, PiecesPreviewType
     from pygame import Surface
 
 class PiecesPreview:

@@ -1,8 +1,8 @@
 from typing import TYPE_CHECKING
-from ...util import get_asset
+from src.util import get_asset
 
 if TYPE_CHECKING:
-    from ..resource_manager import ResourceManager
+    from src.resources.resource_manager import ResourceManager
 
 def _load_images(rm: "ResourceManager") -> None:
         # BOARD BASE

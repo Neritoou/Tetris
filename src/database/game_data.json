@@ -1,0 +1,35 @@
+{
+    "records": {
+        "guideline": [
+            {
+                "score": 94465,
+                "lines": 50,
+                "level": 26,
+                "tetrises": 3,
+                "date": "2026-03-04"
+            },
+            {
+                "score": 368,
+                "lines": 0,
+                "level": 1,
+                "tetrises": 0,
+                "date": "2026-03-04"
+            },
+            {
+                "score": 224,
+                "lines": 0,
+                "level": 1,
+                "tetrises": 0,
+                "date": "2026-03-04"
+            },
+            {
+                "score": 204,
+                "lines": 0,
+                "level": 1,
+                "tetrises": 0,
+                "date": "2026-03-04"
+            }
+        ],
+        "nes": []
+    }
+}

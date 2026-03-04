@@ -7,28 +7,29 @@ from src.ui import UIMenu, UILabel, UIManager
 
 if TYPE_CHECKING:
     from src.core.game import Game
+    from src.database import RulesetName
 
 class PauseState(GameState):
     """Estado de pausa que se superpone al juego."""
-    def __init__(self, game: "Game"):
+    def __init__(self, game: "Game", ruleset_name: "RulesetName"):
         super().__init__(game)
-        
+        self.ruleset_name = ruleset_name
+
         self.font_title = self.game.resources.get_font("Estandar", 100)
-        self.font_menu = self.game.resources.get_font("Estandar", 48)
+        self.font_menu  = self.game.resources.get_font("Estandar", 48)
         
         self.title = UILabel("pause_title", SCREEN_CENTER_W, 200,
             "PAUSA", self.font_title, (130, 59, 188))
 
         options = [
-            ("CONTINUAR", self._on_resume),
-            ("REINICIAR", self._on_restart),
+            ("CONTINUAR",      self._on_resume),
+            ("REINICIAR",      self._on_restart),
             ("VOLVER AL MENU", self._on_menu),
-            ("OPCIONES", self._on_options)
+            ("OPCIONES",       self._on_options)
         ]
         
         self.menu = UIMenu("pause_menu", SCREEN_CENTER_W, 350,
-            options, self.font_menu, spacing=80, center_text=True
-        )
+            options, self.font_menu, spacing=80, center_text=True)
 
         self.ui: UIManager = UIManager()
         self.ui.add_element(self.title)
@@ -44,7 +45,6 @@ class PauseState(GameState):
         if self.game.input.is_action_pressed("ui", "pause"):
             self._on_resume()
             return
-
         if self.game.input.is_action_pressed("ui", "up"):
             self.menu.move_up()
         elif self.game.input.is_action_pressed("ui", "down"):
@@ -53,18 +53,14 @@ class PauseState(GameState):
             self.menu.execute_selected()
     
     def update(self, dt: float) -> None:
-        """Actualiza el menú de pausa."""
         self.ui.update(dt)
     
     def render(self, surface: pygame.Surface) -> None:
-        # Fondo semitransparente oscuro
         overlay = pygame.Surface((surface.get_width(), surface.get_height()))
         overlay.set_alpha(200)
         overlay.fill((0, 0, 0))
         surface.blit(overlay, (0, 0))
-
         self.ui.render(surface)
-    
 
     @property
     def overlay_type(self) -> OverlayType:
@@ -73,28 +69,24 @@ class PauseState(GameState):
     @property
     def is_transient(self) -> bool:
         return False
-    
-
 
     # --- Callbacks ---
     def _on_resume(self):
-        """Continúa el juego."""
         self.game.state.exit_current()
     
     def _on_restart(self):
-        """Reinicia la partida."""
         config = self.game.gameplay_config.data
-        ruleset = config["rulesets"]["custom"]
-        
+        ruleset = config["rulesets"][self.ruleset_name.value]
         self.game.state.clear()
-        
-        self.game.state.change(StateID.PLAY, session_data=config, ruleset=ruleset)
+        self.game.state.change(StateID.PLAY,
+            session_data = config,
+            ruleset      = ruleset,
+            ruleset_name = self.ruleset_name,
+        )
     
     def _on_options(self):
-        """Abre el menú de opciones (si existe)."""
         print("Menú de opciones aún no implementado")
     
     def _on_menu(self):
-        """Vuelve al menú principal."""
         self.game.state.clear()
         self.game.state.change(StateID.MENU)

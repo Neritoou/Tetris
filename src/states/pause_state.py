@@ -76,13 +76,10 @@ class PauseState(GameState):
     
     def _on_restart(self):
         config = self.game.gameplay_config.data
-        ruleset = config["rulesets"][self.ruleset_name.value]
+        ruleset = config["rulesets"][self.ruleset_name]
         self.game.state.clear()
-        self.game.state.change(StateID.PLAY,
-            session_data = config,
-            ruleset      = ruleset,
-            ruleset_name = self.ruleset_name,
-        )
+        self.game.state.change(StateID.PLAY, session_data=config, ruleset=ruleset, ruleset_name=self.ruleset_name)
+
     
     def _on_options(self):
         print("Menú de opciones aún no implementado")

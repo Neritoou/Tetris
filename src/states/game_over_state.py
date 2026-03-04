@@ -80,7 +80,7 @@ class GameOverState(GameState):
     def _on_retry(self):
         """Comienza una nueva partida."""
         config = self.game.gameplay_config.data
-        ruleset = config["rulesets"][self.ruleset_name.value]
+        ruleset = config["rulesets"][self.ruleset_name]
         self.game.state.clear()
         self.game.state.change(StateID.PLAY, session_data=config, ruleset=ruleset, ruleset_name=self.ruleset_name)
 

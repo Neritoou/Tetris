@@ -15,6 +15,7 @@ class Board:
     el movimiento y rotación de la pieza activa mediante validaciones de 
     colisión y procesar la eliminación de líneas completas.
     """
+    ANIM_STEP_DURATION = 0.08
     def __init__(self, rows: int, cols: int, surface: pygame.Surface, 
                  cell_width: int, cell_height: int,
                  pos_x: int, pos_y: int) -> None:
@@ -38,18 +39,58 @@ class Board:
         self.cell_width = cell_width
         self.cell_height = cell_height
 
+
+        # Animación de eliminación de líneas
+        self._anim_rows:  list[int] = []
+        self._anim_set:   set[int]  = set()
+        self._anim_step:  int       = 0
+        self._anim_timer: float     = 0.0
+        self._anim_total: int       = cols // 2
+
+    @property
+    def is_animating(self) -> bool:
+        """True mientras haya una animación de eliminación de filas en curso."""
+        return bool(self._anim_rows)
+    
+    def update(self, dt: float) -> None:
+        """
+        Avanza la animación activa.
+
+        Cuando la animación termina, aplica la eliminación real de filas
+        y limpia el estado de animación.
+        """
+        if not self._anim_rows:
+            return
+
+        self._anim_timer += dt
+        if self._anim_timer >= self.ANIM_STEP_DURATION:
+            self._anim_timer -= self.ANIM_STEP_DURATION
+            self._anim_step  += 1
+
+            if self._anim_step >= self._anim_total:
+                self.__remove_filled_lines(np.array(self._anim_rows))
+                self._anim_rows  = []
+                self._anim_set   = set()
+                self._anim_step  = 0
+                self._anim_timer = 0.0
+
     def draw(self, surface: pygame.Surface, pieces: "PieceDataType") -> None:
         """Dibuja el fondo del tablero, los bloques estáticos y la pieza activa."""
         # Dibuja la Board
         surface.blit(self._surface, self._rect)
+        center = self.cols // 2
 
         for (row,col), block in np.ndenumerate(self.matrix):
-            if block:
-                bx = self._rect.x + col * self.cell_width
-                by = self._rect.y + row * self.cell_height
-                block_surface = pieces[NUM_TO_PIECE[block]]["block"]["placed"]
+            if not block:
+                continue
+            if (self._anim_rows
+                    and row in self._anim_set
+                    and center - self._anim_step <= col <= center + self._anim_step - 1):
+                continue
 
-                surface.blit(block_surface, (bx, by))
+            bx = self._rect.x + col * self.cell_width
+            by = self._rect.y + row * self.cell_height
+            surface.blit(pieces[NUM_TO_PIECE[block]]["block"]["placed"], (bx, by))
 
     def lock_piece(self, piece: "Piece") -> None:
         """
@@ -63,25 +104,25 @@ class Board:
 
     def clear_lines(self) -> int:
         """
-        Escanea el tablero para eliminar filas llenas y desplazar las filas
-        superiores hacia abajo.
+        Detecta las filas completas e inicia la animación de eliminación.
+
+        La remoción real de la matriz ocurre al finalizar la animación (ver update).
+        El conteo se devuelve de inmediato para que Score calcule los puntos sin esperar.
 
         Returns:
-            int: Cantidad de líneas eliminadas.
+            int: Cantidad de líneas detectadas (0 si no hay ninguna).
         """
-        lines_cleared = 0
-
-        # Detecta las filas llenas
         fullrows = self.__find_fullrows()
 
-        if len(fullrows) > 0:
-            lines_cleared = len(fullrows)
-            # EN CASO DE HACER ANIMACIONES, AQUI DEBERIAN DE IR
+        if len(fullrows) == 0:
+            return 0
 
-            # Elimina las filas completas y las desplaza
-            self.__remove_filled_lines(fullrows)
+        self._anim_rows  = list(fullrows)
+        self._anim_set   = set(fullrows)
+        self._anim_step  = 0
+        self._anim_timer = 0.0
 
-        return lines_cleared
+        return len(fullrows)
     
     def is_valid_move(self, piece: "Piece", row: int | None = None, col: int | None = None) -> bool:
         """

@@ -37,6 +37,7 @@ class GameBoardController:
         self._piece:         Piece | None = None
         self._hold_piece:    Piece | None = None
         self._last_action_was_rotation: bool = False
+        self._piece_just_locked = False
 
         gravity     = create_gravity(ruleset, session_config)
         lock        = create_lock(ruleset, session_config)
@@ -74,6 +75,13 @@ class GameBoardController:
         if self._game_over:
             return
 
+        # Siempre avanza la animación si hay una activa
+        self._board.update(dt)
+
+        # Mientras haya animación, no se spawna ni mueve nada
+        if self._board.is_animating:
+            return
+        
         if self._piece is None or self._piece.is_locked():
             self._spawn_piece()
             if self._is_spawn_blocked():
@@ -174,7 +182,12 @@ class GameBoardController:
             self._preview.generate()
             self._mechanics.calculate_ghost(self._piece)
 
-
+    def consume_lock_event(self) -> bool:
+        """Retorna True si una pieza se bloqueó este frame y resetea el flag."""
+        if self._piece_just_locked:
+            self._piece_just_locked = False
+            return True
+        return False
 
     # --- ESTADO ---
 
@@ -223,4 +236,6 @@ class GameBoardController:
         self._score.update(lines, move_type)
         self._last_action_was_rotation = False
         self._mechanics.reset()
+        self._piece_just_locked = True
+
 

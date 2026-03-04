@@ -5,22 +5,25 @@ from src.controller import InputManager
 from src.audio import AudioManager
 from src.states import *
 from src.config import *
+from src.database import Database
+from src.util.paths import get_path
 
 class Game(GameBase):
     def __init__(self, metadata: GameMeta) -> None:
         super().__init__(metadata)
-        self.controls_config = ControlsConfig(path="config/controls.json")
-        self.gameplay_config = BaseConfig[GameplayConfigType](path = "config/gameplay.json")
+        self.controls_config = ControlsConfig(path = str(get_path("config","controls.json")))
+        self.gameplay_config = BaseConfig[GameplayConfigType](path = str(get_path("config","gameplay.json")))
+        self.database = Database(get_path("src","database","game_data.json"))
         self.resources = ResourceManager()
         self.audio = AudioManager()
         self.input = InputManager(self.controls_config.data)
         self.state = StateManager(self)
 
+
     def start(self, surface: pygame.Surface):
         super().start(surface)
-        # Cargar Recursos 
         self.resources.load()
-        # Estado inicial       
+        self.database.load()
         self.state.change(StateID.MENU)
         self.audio.register_sounds(self.resources.get_sounds())
     
@@ -32,5 +35,4 @@ class Game(GameBase):
         self.state.update(dt)
 
     def render(self) -> None:
-        self.surface.fill((0, 0, 0))
         self.state.render(self.surface)

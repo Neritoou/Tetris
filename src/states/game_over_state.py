@@ -4,14 +4,18 @@ from src.states.game_state import GameState
 from src.states.types import StateID, OverlayType
 from src.constants import SCREEN_CENTER_W
 from src.ui import UIManager, UIMenu, UILabel
+from src.database import Record
 
 if TYPE_CHECKING:
     from src.core.game import Game
+    from src.database import RulesetName, RawRecord
 
 class GameOverState(GameState):
     """Estado de Game Over que se superpone al perder la partida."""
-    def __init__(self, game: "Game", final_score: int):
+    def __init__(self, game: "Game", ruleset_name: "RulesetName", stats: "RawRecord"):
         super().__init__(game)
+        self.ruleset_name = ruleset_name
+        self.stats = stats
 
         font_title = self.game.resources.get_font("Estandar", 100)
         font_score = self.game.resources.get_font("Estandar", 48)
@@ -24,7 +28,7 @@ class GameOverState(GameState):
         ]
 
         self.title = UILabel("game_title", SCREEN_CENTER_W, 200, "GAME OVER", font_title, (255, 0, 0))
-        self.score_text = UILabel("final_score", SCREEN_CENTER_W, 290, f"Puntuacion final: {final_score}", font_score)
+        self.score_text = UILabel("final_score", SCREEN_CENTER_W, 290, f"Puntuacion final: {self.stats["score"]}", font_score)
         
         self.menu = UIMenu("game_over_menu", SCREEN_CENTER_W, 410,
                            options, font_menu, spacing=70, center_text=True)
@@ -35,6 +39,7 @@ class GameOverState(GameState):
         self.ui.add_element(self.menu)
     
     def on_enter(self) -> None:
+        self._try_save_record()
         pass
     
     def on_exit(self) -> None:
@@ -75,8 +80,10 @@ class GameOverState(GameState):
     def _on_retry(self):
         """Comienza una nueva partida."""
         config = self.game.gameplay_config.data
-        ruleset = config["rulesets"]["custom"]
-        self.game.state.change(StateID.PLAY, session_data=config, ruleset=ruleset)
+        ruleset = config["rulesets"][self.ruleset_name]
+        self.game.state.clear()
+        self.game.state.change(StateID.PLAY, session_data=config, ruleset=ruleset, ruleset_name=self.ruleset_name)
+
     
     def _on_menu(self):
         """Vuelve al menú principal."""
@@ -85,3 +92,14 @@ class GameOverState(GameState):
     def _on_exit(self):
         """Detiene y cierra la ventana del juego."""
         self.game.stop()
+
+
+    # --- Helpers ---
+    def _try_save_record(self) -> None:
+        """Construye un TetrisRecord y lo intenta guardar en la database."""
+        record = Record(**self.stats)
+        entered = self.game.database.save_record(self.ruleset_name, record)
+        if entered:
+            print(f"Nuevo record guardado en {self.ruleset_name}!")  # (!) reemplazar por feedback visual
+
+

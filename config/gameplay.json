@@ -7,9 +7,8 @@
     },
 
     "rulesets": {
-        "guideline": {"gravity_type": "exponential", "lock_type": "resettable", "hold": true},
-        "nes": {"gravity_type": "for_levels", "lock_type": "auto", "hold": false},
-        "custom": {"gravity_type": "for_levels", "lock_type": "resettable", "hold": true}
+        "guideline": {"gravity_type": "exponential", "lock_type": "resettable", "hold": true,  "wall_kicks": true},
+        "nes":       {"gravity_type": "for_levels",  "lock_type": "auto", "hold": false, "wall_kicks": true}
     },
 
     "score": {

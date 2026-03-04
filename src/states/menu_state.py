@@ -71,9 +71,9 @@ class MenuState(GameState):
     def _on_play(self):
         """Inicia una partida."""
         config = self.game.gameplay_config.data
-        ruleset = config["rulesets"]["custom"]
+        ruleset = config["rulesets"]["guideline"]
 
-        self.game.state.change(StateID.PLAY, session_data = config, ruleset = ruleset)
+        self.game.state.change(StateID.PLAY, session_data = config, ruleset = ruleset, ruleset_name = "guideline")
     
     def _on_config(self):
         print("ESCENA DE CONFIGURACIONES")

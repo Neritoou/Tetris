@@ -4,102 +4,111 @@ from src.states.game_state import GameState
 from src.core import GameBoardController
 from src.constants import BOARD_X, BOARD_Y
 from src.states.types import StateID, OverlayType
+from src.util import ScreenShake, ShakeDirection
 
 if TYPE_CHECKING:
     from src.core.game import Game
     from src.core.types import PieceDataType, BoardType, PiecesPreviewType
     from src.config.gameplay import GameplayConfigType, GameplayRulesetType
+    from src.database import RulesetName
+
 
 class PlayState(GameState):
-    """
-    Estado principal del juego donde ocurren todas las acciones del Tetris.
-
-    Coordina la interacción entre el tablero (Board), el generador de piezas
-    (PieceBag) y la entrada del usuario.
-    """
-    def __init__(self, game: "Game", session_data: "GameplayConfigType", ruleset: "GameplayRulesetType"):
+    def __init__(self, game: "Game", session_data: "GameplayConfigType",
+                 ruleset: "GameplayRulesetType", ruleset_name: "RulesetName"):
         super().__init__(game)
         self._started = False
-        self._pause = False
+        self._game_over_triggered = False
         self.session_config = session_data
-        
-        # (!) LA FONT ES DE PRUEBA
         self.ruleset = ruleset
-        self.font = pygame.font.SysFont("Consolas", 20)
-        self.pieces: "PieceDataType" 
+        self.ruleset_name = ruleset_name
+        self.pieces: "PieceDataType"
         self.session: GameBoardController
-    
-    def on_enter(self) -> None:
-        self.pieces =  self.game.resources.get_pieces()
-        board_surface = self.game.resources.get_image("Board")
+        self._shake = ScreenShake(intensity=4, duration=0.2)
+        self._temp_surface = pygame.Surface(game.surface.get_size())
 
-        board_config: "BoardType" = {"surface": board_surface, "pos_x": BOARD_X, "pos_y": BOARD_Y}
-        preview_config: "PiecesPreviewType" =  {"pos_x": BOARD_X + board_surface.get_width() + 20, "pos_y": BOARD_Y, 
-                                                "max_width": 80, "margin": 8, 
-                                                "preview_count": self.session_config["general"]["preview_count"]}
-        
-        self.session = GameBoardController(self.session_config, self.ruleset, self.pieces, board_config, preview_config)                                     
-        self.game.state.change(StateID.COUNTDOWN, playstate = self)
+        self.font = pygame.font.SysFont("Consolas", 20)  # (!) TEMPORAL
+
+    def on_enter(self) -> None:
+        self.pieces       = self.game.resources.get_pieces()
+        board_surface     = self.game.resources.get_image("Board")
+
+        board_config: "BoardType" = {
+            "surface": board_surface,
+            "pos_x":   BOARD_X,
+            "pos_y":   BOARD_Y,
+        }
+        preview_config: "PiecesPreviewType" = {
+            "pos_x":         BOARD_X + board_surface.get_width() + 20,
+            "pos_y":         BOARD_Y,
+            "max_width":     80,
+            "margin":        8,
+            "preview_count": self.session_config["general"]["preview_count"],
+        }
+
+        self.session = GameBoardController(
+            self.session_config, self.ruleset,
+            self.pieces, board_config, preview_config
+        )
+        self.game.state.change(StateID.COUNTDOWN, playstate=self)
 
     def on_exit(self) -> None:
-        return
-    
+        pass
+
     def handle_input(self, events: list[pygame.event.Event]) -> None:
-        if not self._started or self.game_over:
+        if not self._started or self.session.is_game_over():
             return
-        
-        if self.game.input.is_action_pressed("play", "move_left"):
-            if self.session.try_move_piece_to(0,-1):
-                self.session.lock.on_move()
-
-        if self.game.input.is_action_pressed("play", "move_right"):
-            if self.session.try_move_piece_to(0,1):
-                self.session.lock.on_move()
-
-        if self.game.input.is_action_pressed("play", "move_down"):
-            if self.session.try_soft_drop_piece():
-                self.session.lock.on_move()
-
-        if self.game.input.is_action_pressed("play", "rotate_piece_right"):
-            if self.session.try_rotate_piece(1):
-                self.session.lock.on_move()
-
-        if self.game.input.is_action_pressed("play", "rotate_piece_left"):
-            if self.session.try_rotate_piece(-1):
-                self.session.lock.on_move()
-
-        if self.game.input.is_action_pressed("play", "hard_drop"):
-            self.session.try_hard_drop_piece()
-            self.session.resolve_piece_lock()
 
         if self.game.input.is_action_pressed("ui", "pause"):
-            self.game.state.change(StateID.PAUSE)
+            self.game.state.change(StateID.PAUSE, ruleset_name=self.ruleset_name)
             return
-    
-    def render(self, surface: pygame.Surface) -> None:
-        surface.fill((30, 30, 30))
-        self.session.draw(self.game.surface, self.pieces)
-        self.session.score.debug_draw(self.game.surface,self.font,(self.session.fall_delay, self.session.fall_timer),(self.session.lock.delay, self.session.lock.timer))
+
+        if self.game.input.is_action_pressed("play", "move_left"):
+            self.session.move_left()
+        if self.game.input.is_action_pressed("play", "move_right"):
+            self.session.move_right()
+        if self.game.input.is_action_pressed("play", "move_down"):
+            self.session.soft_drop()
+        if self.game.input.is_action_pressed("play", "rotate_piece_right"):
+            self.session.rotate_right()
+        if self.game.input.is_action_pressed("play", "rotate_piece_left"):
+            self.session.rotate_left()
+        if self.game.input.is_action_pressed("play", "hard_drop"):
+            self.session.hard_drop()
+        if self.game.input.is_action_pressed("play", "hold"):
+            self.session.hold()
 
     def update(self, dt: float) -> None:
-        if not self._started and self.game_over:
+        if not self._started:
             return
-        
-        self.session.update(dt)
 
-        if self.game_over:
-            final_score = self.session.score.current_score
-            self.game.state.change(StateID.GAME_OVER, final_score=final_score)
-    
-    def _start_game(self):
+        self.session.update(dt)
+        if self.session.consume_lock_event():
+            self._shake.trigger(ShakeDirection.VERTICAL)
+
+        self._shake.update(dt)
+
+        if self.session.is_game_over() and not self._game_over_triggered:
+            self._game_over_triggered = True
+            self.game.state.change(
+                StateID.GAME_OVER,
+                ruleset_name = self.ruleset_name,
+                stats        = self.session.final_stats,
+            )
+
+    def render(self, surface: pygame.Surface) -> None:
+        target = self._temp_surface if self._shake.is_active else surface
+        target.fill((30, 30, 30))
+        self.session.draw(target, self.pieces)
+        self.session.debug_draw(target, self.font)
+
+        if self._shake.is_active:
+            surface.fill((30, 30, 30))
+            surface.blit(target, self._shake.offset)
+
+    def _start_game(self) -> None:
         self._started = True
         self.session.start()
-
-
-    @property
-    def game_over(self) -> bool:
-        """Verifica si la pieza recién generada colisiona de inmediato."""
-        return self.session.is_game_over()
 
     @property
     def overlay_type(self) -> OverlayType:

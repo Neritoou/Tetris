@@ -5,7 +5,8 @@
         "move_down": ["s", "DOWN"],
         "rotate_piece_right": ["e", "UP"],
         "rotate_piece_left": ["q"],
-        "hard_drop": ["SPACE"]
+        "hard_drop": ["SPACE"],
+        "hold": ["c", "LSHIFT"]
     },
     "ui": {
         "select": ["RETURN"],

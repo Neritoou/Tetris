@@ -108,8 +108,52 @@ class Board:
         return not np.any(self.matrix[-check_rows:, :])
 
 
+    def detect_t_spin(self, piece: "Piece") -> str:
+        if piece.name != "T":
+            return "normal"
 
+        cr = piece.row + 1
+        cc = piece.col + 1
+
+        corners = [
+            (cr - 1, cc - 1),  # TL
+            (cr - 1, cc + 1),  # TR
+            (cr + 1, cc - 1),  # BL
+            (cr + 1, cc + 1),  # BR
+        ]
+
+        front_corners = {
+            0: (corners[0], corners[1]),  # rot 0 → arriba:    TL, TR
+            1: (corners[1], corners[3]),  # rot 1 → derecha:   TR, BR
+            2: (corners[2], corners[3]),  # rot 2 → abajo:     BL, BR
+            3: (corners[0], corners[2]),  # rot 3 → izquierda: TL, BL
+        }
+
+        occupied = [self._is_corner_occupied(r, c) for r, c in corners]
+        count    = sum(occupied)
+
+        f1, f2         = front_corners[piece.rot % 4]
+        both_front     = self._is_corner_occupied(*f1) and self._is_corner_occupied(*f2)
+
+        if count >= 3:
+            # T-spin propio: ambas esquinas frontales bloqueadas
+            # Mini T-spin:   solo una esquina frontal bloqueada (imposible con 4, pero válido con 3)
+            return "t_spin" if both_front else "mini_t_spin"
+
+        if count == 2 and both_front:
+            return "mini_t_spin"
+
+        return "normal"
+
+
+    
     # --- HELPERS ---
+    def _is_corner_occupied(self, r: int, c: int) -> bool:
+        """Retorna True si la celda está fuera del tablero o tiene un bloque."""
+        if r < 0 or r >= self.rows or c < 0 or c >= self.cols:
+            return True
+        return bool(self.matrix[r, c])
+    
     def get_pixels_of_cell(self, row: int, col: int) -> tuple[int, int]:
         """
         Convierte una posición de celda del tablero (row, col) en coordenadas

@@ -4,6 +4,7 @@ from src.states.game_state import GameState
 from src.core import GameBoardController
 from src.constants import BOARD_X, BOARD_Y
 from src.states.types import StateID, OverlayType
+from src.util import ScreenShake, ShakeDirection
 
 if TYPE_CHECKING:
     from src.core.game import Game
@@ -16,13 +17,16 @@ class PlayState(GameState):
     def __init__(self, game: "Game", session_data: "GameplayConfigType",
                  ruleset: "GameplayRulesetType", ruleset_name: "RulesetName"):
         super().__init__(game)
-        self._started             = False
+        self._started = False
         self._game_over_triggered = False
-        self.session_config       = session_data
-        self.ruleset              = ruleset
-        self.ruleset_name         = ruleset_name
+        self.session_config = session_data
+        self.ruleset = ruleset
+        self.ruleset_name = ruleset_name
         self.pieces: "PieceDataType"
         self.session: GameBoardController
+        self._shake = ScreenShake(intensity=4, duration=0.2)
+        self._temp_surface = pygame.Surface(game.surface.get_size())
+
         self.font = pygame.font.SysFont("Consolas", 20)  # (!) TEMPORAL
 
     def on_enter(self) -> None:
@@ -79,6 +83,10 @@ class PlayState(GameState):
             return
 
         self.session.update(dt)
+        if self.session.consume_lock_event():
+            self._shake.trigger(ShakeDirection.VERTICAL)
+
+        self._shake.update(dt)
 
         if self.session.is_game_over() and not self._game_over_triggered:
             self._game_over_triggered = True
@@ -89,9 +97,14 @@ class PlayState(GameState):
             )
 
     def render(self, surface: pygame.Surface) -> None:
-        surface.fill((30, 30, 30))
-        self.session.draw(surface, self.pieces)
-        self.session.debug_draw(surface, self.font)
+        target = self._temp_surface if self._shake.is_active else surface
+        target.fill((30, 30, 30))
+        self.session.draw(target, self.pieces)
+        self.session.debug_draw(target, self.font)
+
+        if self._shake.is_active:
+            surface.fill((30, 30, 30))
+            surface.blit(target, self._shake.offset)
 
     def _start_game(self) -> None:
         self._started = True

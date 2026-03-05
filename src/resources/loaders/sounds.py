@@ -16,3 +16,5 @@ def _load_sounds(rm: "ResourceManager"):
         rm.load_sound("LockPiece", AudioCategory.SFX, str(get_asset("sounds", "lock_piece.ogg")))
         rm.load_sound("MovePiece", AudioCategory.SFX, str(get_asset("sounds", "move_piece.ogg")))
         rm.load_sound("RotatePiece", AudioCategory.SFX, str(get_asset("sounds", "rotate_piece.ogg")))
+        rm.load_sound("GameOver", AudioCategory.SFX, str(get_asset("sounds", "game_over.ogg")))
+        rm.load_sound("Countdown", AudioCategory.SFX, str(get_asset("sounds", "countdown.ogg")))

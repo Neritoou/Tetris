@@ -7,3 +7,4 @@ if TYPE_CHECKING:
 def _load_music_paths(rm: "ResourceManager"):
         rm.load_music_path("TitleMusic", str(get_asset("sounds", "title_music.ogg")))
         rm.load_music_path("GameplayMusic", str(get_asset("sounds", "gameplay_music.ogg")))
+        rm.load_music_path("HighScore", str(get_asset("sounds", "high_score.ogg")))

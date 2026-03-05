@@ -2,10 +2,10 @@ import pygame
 from typing import TYPE_CHECKING
 from src.states.game_state import GameState
 from src.core import GameBoardController
-from src.constants import BOARD_X, BOARD_Y
+from src.constants import BOARD_X, BOARD_Y, SCREEN_H, SCREEN_W
 from src.states.types import StateID, OverlayType
-from src.util import ScreenShake, ShakeDirection
-from src.ui import UIFloatingLabel, UILabel, UIManager
+from src.util import ScreenShake, ShakeDirection, get_hint_key
+from src.ui import UIFloatingLabel, UILabel, UIManager, UIHintBar
 
 if TYPE_CHECKING:
     from src.core.game import Game
@@ -74,31 +74,37 @@ class PlayState(GameState):
         if not self._started or self.session.is_game_over():
             return
 
-        if self.game.input.is_action_pressed("ui", "pause"):
+        if self.game.input.is_action_pressed("ui", "pause") or self.game.input.is_action_pressed("ui","back"):
             self.game.state.change(StateID.PAUSE, ruleset_name=self.ruleset_name)
             return
 
         if self.game.input.is_action_pressed("play", "move_left"):
-            self.game.audio.play_sfx("MovePiece")
-            self.session.move_left()
+            if self.session.move_left():
+                self.game.audio.play_sfx("MovePiece")
+
         if self.game.input.is_action_pressed("play", "move_right"):
-            self.game.audio.play_sfx("MovePiece")
-            self.session.move_right()
+            if self.session.move_right():
+                self.game.audio.play_sfx("MovePiece")
+
         if self.game.input.is_action_pressed("play", "move_down"):
-            self.game.audio.play_sfx("MovePiece")
-            self.session.soft_drop()
+            if self.session.soft_drop():
+                self.game.audio.play_sfx("MovePiece")
+
         if self.game.input.is_action_pressed("play", "rotate_right"):
-            self.game.audio.play_sfx("RotatePiece")
-            self.session.rotate_right()
+            if self.session.rotate_right():
+                self.game.audio.play_sfx("RotatePiece")
+
         if self.game.input.is_action_pressed("play", "rotate_left"):
-            self.game.audio.play_sfx("RotatePiece")
-            self.session.rotate_left()
+            if self.session.rotate_left():
+                self.game.audio.play_sfx("RotatePiece")
+
         if self.game.input.is_action_pressed("play", "hard_drop"):
-            self.game.audio.play_sfx("LockPiece")
             self.session.hard_drop()
+            #self.game.audio.play_sfx("LockPiece")
+
         if self.game.input.is_action_pressed("play", "hold") and self.ruleset_name == "guideline":
-            self.game.audio.play_sfx("RotatePiece")
-            self.session.hold()
+            if self.session.hold():
+                self.game.audio.play_sfx("RotatePiece")
 
     def update(self, dt: float) -> None:
         if not self._started:
@@ -112,6 +118,7 @@ class PlayState(GameState):
         self.val_lines.set_text(str(self.session.total_lines_cleared))
 
         if self.session.consume_lock_event():
+            self.game.audio.play_sfx("LockPiece")
             self._shake.trigger(ShakeDirection.VERTICAL)
 
             points = self.session.last_score_gained
@@ -164,6 +171,7 @@ class PlayState(GameState):
         
         font_title = self.game.resources.get_font("Estandar", 30)
         font_value = self.game.resources.get_font("Estandar", 30)
+        font_hint = self.game.resources.get_font("Estandar", 25)
 
         stats_x = BOARD_X + 10  
         base_y = BOARD_Y + 340
@@ -184,6 +192,18 @@ class PlayState(GameState):
         self.val_lines = UILabel("val_lines", stats_x, base_y + spacing * 2 + 30, "0", font_value, (255, 255, 255), center=False)
         self.ui.add_element(self.val_lines)
 
+
+        ctrl = self.game.controls_config
+        self.ui.add_element(
+            UIHintBar(
+                "play_hints",
+                font_hint,
+                [
+                    (f"{get_hint_key(ctrl, "pause")} / {get_hint_key(ctrl, "back")}", "Pausa"),
+                ],
+                midbottom=(SCREEN_W // 2, SCREEN_H - 5),
+            )
+        )
     @property
     def overlay_type(self) -> OverlayType:
         return OverlayType.NONE

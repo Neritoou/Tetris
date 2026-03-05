@@ -139,42 +139,51 @@ class GameBoardController:
 
 
     # --- INPUT ---
-
-    def move_left(self) -> None:
+    def move_left(self) -> bool:
         if self._piece is None or self._piece.is_locked():
-            return
+            return False
         if self._mechanics.try_move(self._piece, 0, -1):
             self._last_action_was_rotation = False
             self._mechanics.on_move()
+            return True
+        return False
 
-    def move_right(self) -> None:
+    def move_right(self) -> bool:
         if self._piece is None or self._piece.is_locked():
-            return
+            return False
         if self._mechanics.try_move(self._piece, 0, 1):
             self._last_action_was_rotation = False
             self._mechanics.on_move()
+            return True
+        return False
 
-    def soft_drop(self) -> None:
+    def soft_drop(self) -> bool:
         if self._piece is None or self._piece.is_locked():
-            return
+            return False
         if self._mechanics.try_move(self._piece, 1, 0):
             self._score.soft_drop += 1
             self._last_action_was_rotation = False
             self._mechanics.on_move()
+            return True
+        return False
 
-    def rotate_right(self) -> None:
+    def rotate_right(self) -> bool:
         if self._piece is None or self._piece.is_locked():
-            return
+            return False
         if self._mechanics.try_rotate(self._piece, 1):
             self._last_action_was_rotation = True
             self._mechanics.on_move()
+            return True
+        return False
 
-    def rotate_left(self) -> None:
+    def rotate_left(self) -> bool:
         if self._piece is None or self._piece.is_locked():
-            return
+            return False
         if self._mechanics.try_rotate(self._piece, -1):
             self._last_action_was_rotation = True
             self._mechanics.on_move()
+            return True
+        return False
 
     def hard_drop(self) -> None:
         if self._piece is None or self._piece.is_locked():
@@ -185,24 +194,23 @@ class GameBoardController:
         self._last_action_was_rotation = False
         self._resolve_lock()
 
-    def hold(self) -> None:
-        """Guarda la pieza activa y recupera la anterior si el ruleset lo permite."""
+    def hold(self) -> bool:
         if not self._hold_enabled or self._piece is None or self._piece.is_locked():
-            return
+            return False
         if not self._mechanics.consume_hold():
-            return
-
+            return False
         if self._hold_piece is None:
             self._hold_piece = Piece(self._piece.name, self._data[self._piece.name])
             self._spawn_piece(enable_hold=False)
         else:
-            incoming_name    = self._hold_piece.name
+            incoming_name = self._hold_piece.name
             self._hold_piece = Piece(self._piece.name, self._data[self._piece.name])
-            self._piece      = Piece(incoming_name, self._data[incoming_name])
+            self._piece = Piece(incoming_name, self._data[incoming_name])
             self._piece.center(self._board.cols, spawn_offset=PIECE_SPAWN_OFFSET)
             self._mechanics.reset()
             self._preview.generate()
             self._mechanics.calculate_ghost(self._piece)
+        return True
 
     def consume_lock_event(self) -> bool:
         """Retorna True si una pieza se bloqueó este frame y resetea el flag."""

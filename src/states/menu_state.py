@@ -62,14 +62,14 @@ class MenuState(GameState):
 
         options_list =[
             ("JUGAR", self._on_play),
-            ("OPCIONES", self._on_config),
             ("RECORDS", self._on_records),
+            ("OPCIONES", self._on_config),
             ("SALIR", self._on_exit)
         ]
 
         self.menu = UIMenu(
-            "main_menu", SCREEN_CENTER_W, 470, options_list,
-            font_menu, spacing=10, center_text=True
+            "main_menu", SCREEN_CENTER_W, 450, options_list,
+            font_menu, spacing = 3, center_text=True
             )
         
         self.ui: UIManager = UIManager()

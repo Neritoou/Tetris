@@ -27,7 +27,7 @@ class PauseState(GameState):
         if self.menu.is_confirming:
             return
 
-        if self.game.input.is_action_pressed("ui", "pause"):
+        if self.game.input.is_action_pressed("ui", "pause") or self.game.input.is_action_pressed("ui", "back"):
             self.game.audio.play_sfx("Select")
             self._on_resume()
             return

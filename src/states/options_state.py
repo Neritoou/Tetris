@@ -70,13 +70,17 @@ class OptionsState(GameState):
 
 
     def handle_input(self, events: list[pygame.event.Event]) -> None:
+        if self.menu.is_confirming:
+            return
+
         if self.is_volume:
             if self.game.input.is_action_pressed("ui", "left"):
                 self.game.audio.play_sfx("Scroll")
                 self._change_volume(-0.1)
             elif self.game.input.is_action_pressed("ui","right"):
-                self.game.audio.play_sfx("Scroll")
-                self._change_volume(0.1)
+                if self.game.audio.get_master_volume() <= 0.9:
+                    self.game.audio.play_sfx("Scroll")
+                    self._change_volume(0.1)
             elif self.game.input.is_action_pressed("ui", "back"):
                 self.game.audio.play_sfx("Select")
                 self.is_volume = False

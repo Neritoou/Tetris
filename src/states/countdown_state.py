@@ -33,7 +33,9 @@ class CountdownState(GameState):
 
     def on_enter(self) -> None:
         self.game.audio.stop_music()
-    
+        self.game.audio.play_sfx("Countdown")
+
+
     def on_exit(self) -> None:
         self.play_state._start_game()
 

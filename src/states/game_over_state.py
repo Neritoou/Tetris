@@ -21,10 +21,13 @@ class GameOverState(GameState):
     
     def on_enter(self) -> None:
         self._try_save_record()
-        pass
-    
+        self.game.audio.stop_music()
+        path = self.game.resources.get_music_path("HighScore")
+        self.game.audio.play_sfx("GameOver")
+        self.game.audio.play_music(path)    
+
     def on_exit(self) -> None:
-        pass
+        self.game.audio.stop_music()
     
     def handle_input(self, events: list[pygame.event.Event]) -> None:
         if self.game.input.is_action_pressed("ui", "up"):

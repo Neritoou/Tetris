@@ -8,6 +8,7 @@ from src.states.pause_state import PauseState
 from src.states.game_over_state import GameOverState
 from src.states.options_state import OptionsState
 from src.states.keybind_editor_state import KeybindEditorState
+from src.states.records_state import RecordsState
 
 import pygame
 
@@ -31,7 +32,8 @@ class StateManager:
             StateID.PAUSE: PauseState,
             StateID.GAME_OVER: GameOverState,
             StateID.OPTIONS: OptionsState,
-            StateID.KEYBIND_EDITOR: KeybindEditorState
+            StateID.KEYBIND_EDITOR: KeybindEditorState,
+            StateID.RECORDS: RecordsState
         }
 
     @property

@@ -9,6 +9,7 @@ class StateID(Enum):
     GAME_OVER = auto()
     OPTIONS = auto()
     KEYBIND_EDITOR = auto()
+    RECORDS = auto()
     # Más estados
 
 # ENUM DE OVERLAYS PARA LOS ESTADOS DEL JUEGO

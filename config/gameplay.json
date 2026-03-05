@@ -1,7 +1,7 @@
 {
     "general": {
         "starting_level": 1, 
-        "lines_per_level": 2,
+        "lines_per_level": 10,
         "bag_size": 2,
         "preview_count": 5
     },
@@ -11,7 +11,7 @@
             "display_name": "GUIDELINE",
             "description": "Reglas modernas oficiales de Tetris.",
             "gravity_type": "exponential",
-            "lock_type": "resettable",
+            "lock_type": "fixed",
             "hold": true
         },
         "nes": {
@@ -44,7 +44,7 @@
     "lock_types": {
         "auto": {"lock_delay": 0.0},
         "fixed": {"lock_delay": 0.8},
-        "resettable": {"lock_delay": 0.8, "max_moves": 15},
+        "resettable": {"lock_delay": 0.8, "max_moves": 5},
         "collision_delay": {"lock_delay": 1}
     }
 }

@@ -5,6 +5,7 @@ from src.core import GameBoardController
 from src.constants import BOARD_X, BOARD_Y
 from src.states.types import StateID, OverlayType
 from src.util import ScreenShake, ShakeDirection
+from src.ui import UIFloatingLabel, UILabel, UIManager
 
 if TYPE_CHECKING:
     from src.core.game import Game
@@ -26,6 +27,8 @@ class PlayState(GameState):
         self.session: GameBoardController
         self._shake = ScreenShake(intensity=4, duration=0.2)
         self._temp_surface = pygame.Surface(game.surface.get_size())
+
+        self._build_ui()
 
     def on_enter(self) -> None:
         self.pieces       = self.game.resources.get_pieces()
@@ -50,6 +53,18 @@ class PlayState(GameState):
             self.session_config, self.ruleset,
             self.pieces, board_config, preview_config
         )
+
+        center_x = board_config["pos_x"] + 135
+        center_y = board_config["pos_y"] + 300
+        
+        font = self.game.resources.get_font("Estandar", 40) # O la fuente que prefieras
+        
+        self._floating_score = UIFloatingLabel(
+            "score_popup", center_x, center_y, font,
+            float_speed=60.0, fade_duration=1.2, spawn_offset=20.0
+        )
+        self.ui.add_element(self._floating_score)
+
         self.game.state.change(StateID.COUNTDOWN, playstate=self)
 
     def on_exit(self) -> None:
@@ -81,7 +96,7 @@ class PlayState(GameState):
         if self.game.input.is_action_pressed("play", "hard_drop"):
             self.game.audio.play_sfx("LockPiece")
             self.session.hard_drop()
-        if self.game.input.is_action_pressed("play", "hold"):
+        if self.game.input.is_action_pressed("play", "hold") and self.ruleset_name == "guideline":
             self.game.audio.play_sfx("RotatePiece")
             self.session.hold()
 
@@ -90,8 +105,27 @@ class PlayState(GameState):
             return
 
         self.session.update(dt)
+        self._floating_score.update(dt)
+
+        self.val_score.set_text(str(self.session.current_score))
+        self.val_level.set_text(str(self.session.current_level))
+        self.val_lines.set_text(str(self.session.total_lines_cleared))
+
         if self.session.consume_lock_event():
             self._shake.trigger(ShakeDirection.VERTICAL)
+
+            points = self.session.last_score_gained
+            lines = self.session.last_lines_cleared
+
+            if lines > 0:
+                if lines >= 4:
+                    self.game.audio.play_sfx("FourRows")
+                    color = (255, 215, 0)
+                else:
+                    self.game.audio.play_sfx("DeleteRow")
+                    color = (255, 255, 255)
+
+                self._floating_score.show(f"+{points}", color)
 
         self._shake.update(dt)
 
@@ -112,6 +146,8 @@ class PlayState(GameState):
 
         self.session.draw(target, self.pieces)
 
+        self.ui.render(target)
+
         if self._shake.is_active:
             surface.fill((0, 0, 0))
             surface.blit(target, self._shake.offset)
@@ -122,6 +158,31 @@ class PlayState(GameState):
 
         self._started = True
         self.session.start()
+
+    def _build_ui(self) -> None:
+        self.ui = UIManager()
+        
+        font_title = self.game.resources.get_font("Estandar", 30)
+        font_value = self.game.resources.get_font("Estandar", 30)
+
+        stats_x = BOARD_X + 10  
+        base_y = BOARD_Y + 340
+        spacing = 90 # Espacio vertical entre cada bloque de texto
+
+        # SCORE
+        self.ui.add_element(UILabel("lbl_score_txt", stats_x, base_y, "SCORE", font_title, (180, 180, 180), center=False))
+        self.val_score = UILabel("val_score", stats_x, base_y + 30, "0", font_value, (255, 255, 255), center=False)
+        self.ui.add_element(self.val_score)
+
+        # LEVEL
+        self.ui.add_element(UILabel("lbl_lvl_txt", stats_x, base_y + spacing, "LEVEL", font_title, (180, 180, 180), center=False))
+        self.val_level = UILabel("val_lvl", stats_x, base_y + spacing + 30, "1", font_value, (255, 255, 255), center=False)
+        self.ui.add_element(self.val_level)
+
+        # LINES
+        self.ui.add_element(UILabel("lbl_lines_txt", stats_x, base_y + spacing * 2, "LINES", font_title, (180, 180, 180), center=False))
+        self.val_lines = UILabel("val_lines", stats_x, base_y + spacing * 2 + 30, "0", font_value, (255, 255, 255), center=False)
+        self.ui.add_element(self.val_lines)
 
     @property
     def overlay_type(self) -> OverlayType:

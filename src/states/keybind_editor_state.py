@@ -66,47 +66,47 @@ class KeybindEditorState(GameState):
             # --- MODO CAPTURA ---
             if self._editor.is_capturing:
                 if event.key == pygame.K_ESCAPE:
-                    #self.game.audio.play_sfx("scroll")
+                    self.game.audio.play_sfx("Scroll")
                     self._editor.cancel_capture()
                 else:
-                    #self.game.audio.play_sfx("select")
+                    self.game.audio.play_sfx("Select")
                     self._editor.assign(event.key)
                 return
 
             # --- MODO NAVEGACIÓN ---
             match event.key:
                 case pygame.K_UP:
-                    #self.game.audio.play_sfx("scroll")
+                    self.game.audio.play_sfx("Scroll")
                     self._action_cursor = (self._action_cursor - 1) % len(self._actions)
 
                 case pygame.K_DOWN:
-                    #self.game.audio.play_sfx("scroll")
+                    self.game.audio.play_sfx("Scroll")
                     self._action_cursor = (self._action_cursor + 1) % len(self._actions)
 
                 case pygame.K_LEFT:
-                    #self.game.audio.play_sfx("scroll")
+                    self.game.audio.play_sfx("Scroll")
                     self._slot_cursor = (self._slot_cursor - 1) % self._max
 
                 case pygame.K_RIGHT:
-                    #self.game.audio.play_sfx("scroll")
+                    self.game.audio.play_sfx("Scroll")
                     self._slot_cursor = (self._slot_cursor + 1) % self._max
                 
                 case pygame.K_RETURN:
-                    #self.game.audio.play_sfx("select")
+                    self.game.audio.play_sfx("Select")
                     self._slot_buttons[(self._action_cursor, self._slot_cursor)].on_click()
                 
                 case pygame.K_DELETE:
-                    #self.game.audio.play_sfx("scroll")
+                    self.game.audio.play_sfx("Scroll")
                     ctx, act, slot = self._current()
                     self._editor.clear_slot(ctx, act, slot)
                 
                 case pygame.K_s:
-                    #self.game.audio.play_sfx("start")
+                    self.game.audio.play_sfx("Select")
                     self._editor.apply()
                     self.game.input.update_controls(self.game.controls_config.data)
                 
                 case pygame.K_ESCAPE:
-                    #self.game.audio.play_sfx("select")
+                    self.game.audio.play_sfx("Select")
                     self._editor.discard()
                     self.game.state.exit_current()
                     

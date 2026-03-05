@@ -32,7 +32,7 @@ class CountdownState(GameState):
         self.font = self.game.resources.get_font("Estandar", 100)
 
     def on_enter(self) -> None:
-        pass
+        self.game.audio.stop_music()
     
     def on_exit(self) -> None:
         self.play_state._start_game()

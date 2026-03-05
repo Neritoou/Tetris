@@ -28,10 +28,13 @@ class GameOverState(GameState):
     
     def handle_input(self, events: list[pygame.event.Event]) -> None:
         if self.game.input.is_action_pressed("ui", "up"):
+            self.game.audio.play_sfx("Scroll")
             self.menu.move_up()
         elif self.game.input.is_action_pressed("ui", "down"):
+            self.game.audio.play_sfx("Scroll")
             self.menu.move_down()
         elif self.game.input.is_action_pressed("ui", "select"):
+            self.game.audio.play_sfx("Select")
             self.menu.execute_selected()
     
     def update(self, dt: float) -> None:

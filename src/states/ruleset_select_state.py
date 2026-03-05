@@ -36,25 +36,32 @@ class RulesetSelectState(GameState):
         self._build_ui()
         self._update_details()
 
+    def on_enter(self) -> None:
+        pass
+
     def on_exit(self) -> None:
         pass
 
     def handle_input(self, events: list[pygame.event.Event]) -> None:
         if self.game.input.is_action_pressed("ui", "back"):
-            self.game.state.change(StateID.MENU)
+            self.game.audio.play_sfx("Select")
+            self.game.state.exit_current()
             return
 
         if self.game.input.is_action_pressed("ui", "left"):
+            self.game.audio.play_sfx("Scroll")
             self._menu.move_up()
             self._selected = self._menu.selected_index
             self._update_details()
 
         if self.game.input.is_action_pressed("ui", "right"):
+            self.game.audio.play_sfx("Scroll")
             self._menu.move_down()
             self._selected = self._menu.selected_index
             self._update_details()
 
         if self.game.input.is_action_pressed("ui", "select"):
+            self.game.audio.play_sfx("Select")
             self._menu.execute_selected()
 
     def update(self, dt: float) -> None:
@@ -152,7 +159,7 @@ class RulesetSelectState(GameState):
 
     @property
     def overlay_type(self) -> OverlayType:
-        return OverlayType.NONE
+        return OverlayType.FULLSCREEN
 
     @property
     def is_transient(self) -> bool:

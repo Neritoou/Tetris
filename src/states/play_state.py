@@ -64,18 +64,25 @@ class PlayState(GameState):
             return
 
         if self.game.input.is_action_pressed("play", "move_left"):
+            self.game.audio.play_sfx("MovePiece")
             self.session.move_left()
         if self.game.input.is_action_pressed("play", "move_right"):
+            self.game.audio.play_sfx("MovePiece")
             self.session.move_right()
         if self.game.input.is_action_pressed("play", "move_down"):
+            self.game.audio.play_sfx("MovePiece")
             self.session.soft_drop()
         if self.game.input.is_action_pressed("play", "rotate_right"):
+            self.game.audio.play_sfx("RotatePiece")
             self.session.rotate_right()
         if self.game.input.is_action_pressed("play", "rotate_left"):
+            self.game.audio.play_sfx("RotatePiece")
             self.session.rotate_left()
         if self.game.input.is_action_pressed("play", "hard_drop"):
+            self.game.audio.play_sfx("LockPiece")
             self.session.hard_drop()
         if self.game.input.is_action_pressed("play", "hold"):
+            self.game.audio.play_sfx("RotatePiece")
             self.session.hold()
 
     def update(self, dt: float) -> None:
@@ -89,6 +96,7 @@ class PlayState(GameState):
         self._shake.update(dt)
 
         if self.session.is_game_over() and not self._game_over_triggered:
+            self.game.audio.stop_music()
             self._game_over_triggered = True
             self.game.state.change(
                 StateID.GAME_OVER,
@@ -109,6 +117,9 @@ class PlayState(GameState):
             surface.blit(target, self._shake.offset)
 
     def _start_game(self) -> None:
+        path = self.game.resources.get_music_path("GameplayMusic")
+        self.game.audio.play_music(path)
+
         self._started = True
         self.session.start()
 

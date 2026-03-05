@@ -14,12 +14,13 @@ class MenuState(GameState):
     def __init__(self, game: "Game") -> None:
         super().__init__(game)
 
-        self._title = pygame.transform.scale_by(self.game.resources.get_image("Title"), 2.6)
+        self._title = self.game.resources.get_image("Title")
 
         self._build_ui()
         
     def on_enter(self) -> None:
-        pass
+        path = self.game.resources.get_music_path("TitleMusic")
+        self.game.audio.play_music(path)
     
     def on_exit(self) -> None:
         return
@@ -35,10 +36,13 @@ class MenuState(GameState):
 
     def handle_input(self, events: list[pygame.event.Event]) -> None:
         if self.game.input.is_action_pressed("ui", "up"):
+            self.game.audio.play_sfx("Scroll")
             self.menu.move_up()
         elif self.game.input.is_action_pressed("ui", "down"):
+            self.game.audio.play_sfx("Scroll")
             self.menu.move_down()
         elif self.game.input.is_action_pressed("ui", "select"):
+            self.game.audio.play_sfx("Select")
             self.menu.execute_selected()
             
     
@@ -60,8 +64,8 @@ class MenuState(GameState):
         ]
 
         self.menu = UIMenu(
-            "main_menu", SCREEN_CENTER_W, 450, options_list,
-            font_menu, spacing=20, center_text=True
+            "main_menu", SCREEN_CENTER_W, 470, options_list,
+            font_menu, spacing=10, center_text=True
             )
         
         self.ui: UIManager = UIManager()

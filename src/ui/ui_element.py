@@ -1,13 +1,16 @@
 from abc import ABC, abstractmethod
-from typing import Tuple, Union
+from typing import Union
+
 import pygame
+
+ColorValue = Union[pygame.Color, tuple[int, int, int], str, tuple[int, int, int, int]]
 
 class UIElement(ABC):
     """Clase base abstracta para todos los elementos de la interfaz de usuario."""
     def __init__(
             self, name: str, x: int, y: int, width: int, height: int, *,
-            visible: bool, enabled: bool, alpha: int = 255, scale: float = 1.0,
-            angle: int = 0):
+            visible: bool, alpha: int = 255, scale: float = 1.0, angle: int = 0
+            ):
         """
         Inicializa las propiedades comunes de los elementos UI.
         
@@ -18,7 +21,6 @@ class UIElement(ABC):
             width: Ancho en píxeles.
             height: Alto en píxeles.
             visible: Si el elemento es visible en pantalla.
-            enabled: Si el elemento está habilitado para interacción.
             alpha: Transparencia de la imagen.
             scale: Escala (tamaño) de la imagen.
             angle: Ángulo de la imagen.
@@ -28,9 +30,7 @@ class UIElement(ABC):
         # Posición y dimensiones
         self.rect = pygame.Rect(x, y, width, height)
 
-        # Estados de visibilidad y accesibilidad
         self.visible = visible
-        self.enabled = enabled
 
         # Transformaciones
         self.alpha: float = float(alpha)
@@ -44,12 +44,12 @@ class UIElement(ABC):
         self._is_fading: bool = False
 
     @property
-    def position(self) -> Tuple[int, int]:
+    def position(self) -> tuple[int, int]:
         """Obtiene la posición del elemento UI (esquina superior izquierda)."""
         return self.rect.topleft
 
     @position.setter
-    def position(self, pos: Tuple[int, int]) -> None:
+    def position(self, pos: tuple[int, int]) -> None:
         self.rect.topleft = pos
 
     @property
@@ -129,5 +129,5 @@ class UIElement(ABC):
 
                 # Si se excede el valor objetivo, se fija
                 if self.alpha <= self.target_alpha:
-                    self.alpha = self.target_alpha   
-                    self._is_fading = False     
+                    self.alpha = self.target_alpha
+                    self._is_fading = False

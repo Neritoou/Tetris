@@ -9,8 +9,12 @@ class GameplayGeneralType(TypedDict):
     preview_count: int
 
 class GameplayRulesetType(TypedDict):
+    display_name: str
+    description: str
     gravity_type: str
-    lock_type: str
+    lock_type:    str
+    hold:         bool
+    wall_kicks:   bool
 
 class GameplayScoreType(TypedDict):
     soft_drop: int

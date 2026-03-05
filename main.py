@@ -7,7 +7,7 @@ if not pygame.get_init():
 
 metadata = (GameMeta()
             .with_title("Tetris")
-            .with_description("Juego de prueba")
+            .with_description("Juego de puzzle")
             .with_release_date("16/12/2025")
             .with_group_number(1)
             .add_tag("Plataforma")

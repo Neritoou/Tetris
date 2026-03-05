@@ -4,21 +4,18 @@ from typing import Optional, Callable, TYPE_CHECKING
 from src.ui import UIElement
 
 if TYPE_CHECKING:
-    from components import UILabel
+    from src.ui.components import UILabel
 
 class UIButton(UIElement):
     """
     Un botón interactivo que admite estados visuales y ejecución de funciones.
-    
-    Gestiona tres estados visuales (normal, hover y presionado) mediante el cambio
-    de superficies (Surfaces). Puede contener un UILabel interno que se centra
-    automáticamente y sincroniza su visibilidad y transparencia con el botón.
+    Puede contener un UILabel interno que se centra automáticamente.
     """
     def __init__(
             self, name: str, x: int, y: int, callback_function: Callable[[], None],
-            base_button: pygame.Surface, hover_button: Optional[pygame.Surface] = None,
-            press_button: Optional[pygame.Surface] = None, *,
-            text: Optional["UILabel"] = None, visible: bool = True, enabled: bool = True
+            base_button: pygame.Surface, selected_button: pygame.Surface,
+            *, text: Optional["UILabel"] = None, text_y: int = 0,
+            visible: bool = True, alpha: int = 255
     ):
         """
         Inicializa las propiedades de un botón.
@@ -26,78 +23,60 @@ class UIButton(UIElement):
         Args:
             callback_function: Función que se ejecuta al activar el botón.
             base_button: Imagen del botón en estado normal.
-            hover_button: Imagen del botón al pasar el mouse por encima.
-            press_button: Imagen del botón al hacer click.   
+            selected_button: Imagen del botón seleccionado.
             text: Etiqueta de texto contenida en el botón.
         """
-        # Estados del botón (normal, hover, press)
+        # Estados del botón (normal y selected)
         self.button_surface = base_button
-        self.hover_surface = hover_button if hover_button else base_button
-        self.press_surface = press_button if press_button else base_button
+        self.selected_surface = selected_button
+
+        width, height = self.button_surface.get_size()
+
+        super().__init__(name, x, y, width, height, visible=visible, alpha=alpha)
 
         self._surface = base_button
         self._function = callback_function
         self._text = text
 
-        width, height = self.button_surface.get_size()
-
-        if self._text:
+        self._is_selected: bool = False
+        
+        self.text_y = text_y
+        
+        if text_y == 0:
             self._center_text_on_button()
+        else:
+            self._pos_text(text_y)
 
-        # Estados de interacción
-        self._is_hovered: bool = False
-        self._is_pressed: bool = False
-
-        super().__init__(name, x, y, width, height, visible=visible, enabled=enabled)
-
-        if self._text:
-            self._center_text_on_button()
 
 
     # --- PROPIEDADES PARA ACTUALIZAR EL ESTADO ---
     @property
-    def is_hovered(self) -> bool:
+    def is_selected(self) -> bool:
         """Permite a otros objetos leer si el mouse esta encima."""
-        return self._is_hovered
+        return self._is_selected
     
-    @is_hovered.setter
-    def is_hovered(self, value: bool) -> None:
-        self._is_hovered = value
-
-    @property
-    def is_pressed(self) -> bool:
-        """Permite a otros objetos saber si el botón está presionado."""
-        return self._is_pressed
-
-    @is_pressed.setter
-    def is_pressed(self, value: bool) -> None:
-        self._is_pressed = value
-
-    def set_enabled(self, status: bool) -> None:
-        """Activa o desactiva el botón y visualmente le da un tono grisáceo."""
-        self.enabled = status
-        
-        if not status:
-            self.alpha = 128  # Semitransparente
-            self._is_hovered = False
-            self._is_pressed = False
-        else:
-            self.alpha = 255
+    @is_selected.setter
+    def is_selected(self, value: bool) -> None:
+        self._is_selected = value
 
     def set_text(self, new_text: str) -> None:
         """Actualiza el texto del botón de ser necesario."""
         if self._text:
             self._text.set_text(new_text)
-            self._center_text_on_button()
+
+            if self._text and self.text_y == 0:
+                self._center_text_on_button()
+            else:
+                self._pos_text(self.text_y)
+
+
 
     # --- MÉTODOS ABSTRACTOS DE UIElement ---
     def update(self, dt: float) -> None:
         super().update(dt)
 
-        if self.is_pressed and self.press_surface:
-            self._surface = self.press_surface
-        elif self.is_hovered and self.hover_surface:
-            self._surface = self.hover_surface
+        if self.is_selected:
+            self._surface = self.selected_surface
         else:
             self._surface = self.button_surface
 
@@ -121,10 +100,15 @@ class UIButton(UIElement):
     # --- MÉTODOS PRIVADOS ---
     def on_click(self) -> None:
         """Ejecuta la función callback cuando el botón es presionado."""
-        if self.enabled and self._function:
+        if self._function:
             self._function()
 
     def _center_text_on_button(self) -> None:
         """Centra el texto sobre el botón."""
         if self._text:
             self._text.rect.center = self.rect.center
+
+    def _pos_text(self, y: int = 10) -> None:
+        if self._text:
+            self._text.rect.centerx = self.rect.centerx
+            self._text.rect.y = self.rect.y + y

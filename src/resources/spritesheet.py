@@ -18,34 +18,54 @@ class SpriteSheet:
         self._rows = self._h // (self._fh + 2 * self._padding_h)
 
     
-    def get_frame_at(self, row: int, col: int) -> pygame.Surface:
+    def get_frame_at(self, row: int, col: int, trim: bool = False, scale: float = 1.0) -> pygame.Surface:
         self._assert_valid_row(row)
         self._assert_valid_col(col)
 
         x = col * (self._fw + 2 * self._padding_w) + self._padding_w
         y = row * (self._fh + 2 * self._padding_h) + self._padding_h
+        frame = self._image.subsurface(x, y, self._fw, self._fh)
+        if trim: frame = self._trim_surface(frame)
+        if scale != 1.0: frame = self._scale_surface(frame, scale)
 
-        return self._image.subsurface((x, y, self._fw, self._fh))
+        return frame
 
-    def get_frames_at_row(self, row: int) -> list[pygame.Surface]:
+    def get_frames_at_row(self, row: int, trim: bool = False, scale: float = 1.0) -> list[pygame.Surface]:
         self._assert_valid_row(row)
         frames = []
         for col in range(self._cols):
             x = col * (self._fw + 2 * self._padding_w) + self._padding_w
             y = row * (self._fh + 2 * self._padding_h) + self._padding_h
-            frames.append(self._image.subsurface((x, y, self._fw, self._fh)))
+            frame = self._image.subsurface((x, y, self._fw, self._fh))
+            if trim: frame = self._trim_surface(frame)
+            if scale != 1.0: frame = self._scale_surface(frame, scale)
+
+            frames.append(frame)
+
         return frames
 
-
-    def get_frames_at_col(self, col: int) -> list[pygame.Surface]:
+    def get_frames_at_col(self, col: int, trim: bool = False, scale: float = 1.0) -> list[pygame.Surface]:
         self._assert_valid_col(col)
         frames = []
         for row in range(self._rows):
             x = col * (self._fw + 2 * self._padding_w) + self._padding_w
             y = row * (self._fh + 2 * self._padding_h) + self._padding_h
-            frames.append(self._image.subsurface((x, y, self._fw, self._fh)))
+            frame = self._image.subsurface((x, y, self._fw, self._fh))
+            if trim: frame = self._trim_surface(frame)
+            if scale != 1.0: frame = self._scale_surface(frame, scale)
+            
+            frames.append(frame)
+            
         return frames
 
+    def _trim_surface(self, surface: pygame.Surface) -> pygame.Surface:
+        rect = surface.get_bounding_rect()
+        return surface.subsurface(rect).copy()
+
+    def _scale_surface(self, surface: pygame.Surface, scale: float) -> pygame.Surface:
+        new_w = int(surface.get_width() * scale)
+        new_h = int(surface.get_height() * scale)
+        return pygame.transform.smoothscale(surface, (new_w, new_h))
 
     def _assert_valid_row(self, row: int) -> None:
         if row < 0 or row >= self._rows:

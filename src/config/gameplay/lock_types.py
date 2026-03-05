@@ -10,11 +10,10 @@ class ResettableLockType(TypedDict):
     lock_delay: float
     max_moves: int
 
-class ColissionDelayLockType(TypedDict):
+class CollisionDelayLockType(TypedDict):
     lock_delay: float
 
 class GameplayLockType(TypedDict):
     auto: AutoLockType
     fixed: FixedLockType
     resettable: ResettableLockType
-    colission_delay: ColissionDelayLockType

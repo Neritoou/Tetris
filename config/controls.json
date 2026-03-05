@@ -1,16 +1,59 @@
 {
     "play": {
-        "move_left": ["a", "LEFT"],
-        "move_right": ["d", "RIGHT"],
-        "move_down": ["s", "DOWN"],
-        "rotate_piece_right": ["e", "UP"],
-        "rotate_piece_left": ["q"],
-        "hard_drop": ["SPACE"]
+        "move_left": [
+            "left",
+            "a"
+        ],
+        "move_right": [
+            "right",
+            "d"
+        ],
+        "move_down": [
+            "down",
+            "s"
+        ],
+        "rotate_right": [
+            "up",
+            "e"
+        ],
+        "rotate_left": [
+            "q"
+        ],
+        "hard_drop": [
+            "space",
+            "return"
+        ],
+	"hold": [
+        "c",
+        "LSHIFT"
+        ]
     },
     "ui": {
-        "select": ["RETURN"],
-        "down": ["s", "DOWN"],
-        "up": ["w", "UP"],
-        "pause": ["p", "ESCAPE"]
+        "left": [
+            "left",
+            "a"
+        ],
+        "right": [
+            "d",
+            "right"
+        ],
+        "up": [
+            "up",
+            "w"
+        ],
+        "down": [
+            "down",
+            "s"
+        ],
+        "select": [
+            "return"
+        ],
+        "back": [
+            "escape",
+            "delete"
+        ],
+        "pause": [
+            "p"
+        ]
     }
 }

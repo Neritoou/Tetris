@@ -103,7 +103,7 @@ class ResourceManager:
 
         # Si el recurso ya existe, no se crea nuevamente
         if key in self._sounds[category]:
-            if key in self._sounds[category][key]["path"] == path:
+            if self._sounds[category][key]["path"] == path:
                 return
             raise ValueError(f"Resource Manager: Sound '{category}' '{key}' ya tiene asociado un path distinto: '{self._sounds[category][key]['path']}'")
         

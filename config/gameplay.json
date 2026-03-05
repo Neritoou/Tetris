@@ -1,15 +1,28 @@
 {
     "general": {
         "starting_level": 1, 
-        "lines_per_level": 2,
+        "lines_per_level": 10,
         "bag_size": 2,
         "preview_count": 5
     },
 
     "rulesets": {
-        "guideline": {"gravity_type": "exponential", "lock_type": "resettable", "hold": true},
-        "nes": {"gravity_type": "for_levels", "lock_type": "auto", "hold": false},
-        "custom": {"gravity_type": "for_levels", "lock_type": "resettable", "hold": true}
+            "guideline": {
+            "display_name": "GUIDELINE",
+            "description": "Reglas modernas oficiales de Tetris.",
+            "gravity_type": "exponential",
+            "lock_type": "fixed",
+            "hold": true,
+            "wall_kicks": true
+        },
+        "nes": {
+            "display_name": "NES",
+            "description": "Reglas clásicas del Tetris de NES.",
+            "gravity_type": "for_levels",
+            "lock_type": "auto",
+            "hold": false,
+            "wall_kicks": true
+        }
     },
 
     "score": {
@@ -33,7 +46,7 @@
     "lock_types": {
         "auto": {"lock_delay": 0.0},
         "fixed": {"lock_delay": 0.8},
-        "resettable": {"lock_delay": 0.8, "max_moves": 15},
+        "resettable": {"lock_delay": 0.8, "max_moves": 5},
         "collision_delay": {"lock_delay": 1}
     }
 }

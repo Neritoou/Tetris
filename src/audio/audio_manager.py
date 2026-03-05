@@ -183,9 +183,6 @@ class AudioManager:
 
     def play_sfx(self, key: str) -> None:
         self.play_sound(key, AudioCategory.SFX)
-
-    def play_voice(self, key: str) -> None:
-        self.play_sound(key, AudioCategory.VOICE)
     
     def stop_sound(self, sound: pygame.mixer.Sound) -> None:
         """Detiene todas las instancias de un sonido."""

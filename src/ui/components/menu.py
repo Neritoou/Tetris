@@ -60,7 +60,7 @@ class UIMenu(UIElement):
 
         # Estado del parpadeo (Retro Blink Effect)
         self._blink_timer: float = 0.0        # Temporizador (si es > 0, está parpadeando)
-        self._blink_duration: float = 0.80    # Duración total
+        self._blink_duration: float = 0.60    # Duración total
         self._blink_interval: float = 0.08    # Rapidez del titileo
 
         # Cursor de seleccion
@@ -77,6 +77,11 @@ class UIMenu(UIElement):
         super().__init__(name, x, y, width, height, visible=visible, alpha=alpha)
 
         self._update_selection()
+
+    @property
+    def is_confirming(self) -> bool:
+        """True mientras el efecto de confirmación está activo."""
+        return self._blink_timer > 0
 
     @property
     def selected_index(self) -> int:

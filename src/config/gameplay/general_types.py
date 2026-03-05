@@ -9,6 +9,8 @@ class GameplayGeneralType(TypedDict):
     preview_count: int
 
 class GameplayRulesetType(TypedDict):
+    display_name: str
+    description: str
     gravity_type: str
     lock_type:    str
     hold:         bool

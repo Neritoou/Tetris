@@ -80,7 +80,7 @@ class PieceMechanics:
         Args:
             piece: Pieza activa.
         """
-        if piece.col == piece.ghost_col and piece.rot == piece.ghost_rot:
+        if piece.col == piece.ghost_col and piece.rot == piece.ghost_rot and piece.row == piece.ghost_row:
             return
 
         row = piece.row

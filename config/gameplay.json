@@ -12,14 +12,16 @@
             "description": "Reglas modernas oficiales de Tetris.",
             "gravity_type": "exponential",
             "lock_type": "fixed",
-            "hold": true
+            "hold": true,
+            "wall_kicks": true
         },
         "nes": {
             "display_name": "NES",
             "description": "Reglas clásicas del Tetris de NES.",
             "gravity_type": "for_levels",
             "lock_type": "auto",
-            "hold": false
+            "hold": false,
+            "wall_kicks": true
         }
     },
 

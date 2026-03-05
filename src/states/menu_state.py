@@ -14,26 +14,9 @@ class MenuState(GameState):
     def __init__(self, game: "Game") -> None:
         super().__init__(game)
 
-        options_list =[
-            ("JUGAR", self._on_play),
-            ("OPCIONES", self._on_config),
-            ("CREDITOS", self._on_credits),
-            ("SALIR", self._on_exit)
-        ]
+        self._title = pygame.transform.scale_by(self.game.resources.get_image("Title"), 2.6)
 
-        font_title = self.game.resources.get_font("Estandar", 150)
-        font_menu = self.game.resources.get_font("Estandar", 48)
-
-        self.title = UILabel("game_title", SCREEN_CENTER_W, 120, "TETRIS", font_title, (50, 205, 50))
-
-        self.menu = UIMenu(
-            "main_menu", SCREEN_CENTER_W, 360, options_list,
-            font_menu, spacing=80, center_text=True
-            )
-        
-        self.ui: UIManager = UIManager()
-        self.ui.add_element(self.title)
-        self.ui.add_element(self.menu)
+        self._build_ui()
         
     def on_enter(self) -> None:
         pass
@@ -45,7 +28,9 @@ class MenuState(GameState):
         self.ui.update(dt)
 
     def render(self, surface: pygame.Surface) -> None:
-        surface.fill((0, 0, 0))
+        surface.blit(self.game.background, (0, 0))
+
+        surface.blit(self._title, self._title.get_rect(centerx=SCREEN_CENTER_W, y=100))
         self.ui.render(surface)
 
     def handle_input(self, events: list[pygame.event.Event]) -> None:
@@ -65,21 +50,31 @@ class MenuState(GameState):
     def is_transient(self) -> bool:
         return False
     
+    def _build_ui(self) -> None:
+        font_menu = self.game.resources.get_font("Estandar", 48)
+
+        options_list =[
+            ("JUGAR", self._on_play),
+            ("OPCIONES", self._on_config),
+            ("SALIR", self._on_exit)
+        ]
+
+        self.menu = UIMenu(
+            "main_menu", SCREEN_CENTER_W, 450, options_list,
+            font_menu, spacing=20, center_text=True
+            )
+        
+        self.ui: UIManager = UIManager()
+        self.ui.add_element(self.menu)
+
 
 
     # --- Callbacks ---
     def _on_play(self):
-        """Inicia una partida."""
-        config = self.game.gameplay_config.data
-        ruleset = config["rulesets"]["guideline"]
-
-        self.game.state.change(StateID.PLAY, session_data = config, ruleset = ruleset, ruleset_name = "guideline")
+        self.game.state.change(StateID.RULESET_SELECT)
     
     def _on_config(self):
-        print("ESCENA DE CONFIGURACIONES")
-
-    def _on_credits(self):
-        print("ESCENA DE CREDITOS")
+        self.game.state.change(StateID.OPTIONS)
     
     def _on_exit(self):
         """Detiene y cierra la ventana del juego."""

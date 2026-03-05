@@ -20,7 +20,7 @@ class UIButtonMenu(UIElement):
             base_surface: pygame.Surface, selected_surface: pygame.Surface,
             font: pygame.font.Font, text_color: "ColorValue" = (255, 255, 255),
             spacing: int = 20, center_x: bool = False, horizontal: bool = False,
-            visible: bool = True, alpha: int = 255
+            visible: bool = True, alpha: int = 255, text_y: int = 0
     ):
         """
         Args:
@@ -67,7 +67,7 @@ class UIButtonMenu(UIElement):
             btn = UIButton(
                 f"{name}_btn_{i}", int(btn_x), int(btn_y), callback,
                 base_surface.copy(), selected_surface.copy(),
-                text=btn_label, visible=visible, alpha=alpha
+                text=btn_label, text_y=text_y, visible=visible, alpha=alpha
             )
             self._buttons.append(btn)
         

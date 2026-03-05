@@ -14,7 +14,6 @@ from src.core.strategy.lock_strategy import (
     AutoLock,
     FixedLock,
     ResettableLock,
-    CollisionDelayLock
 )
 
 # Ruleset keys
@@ -35,7 +34,6 @@ LOCK_MAP: "dict[str, Type[LockStrategy]]" = {
     "auto": AutoLock,
     "fixed": FixedLock,
     "resettable": ResettableLock,
-    "collision_delay": CollisionDelayLock,
 }
 
 # Factory API

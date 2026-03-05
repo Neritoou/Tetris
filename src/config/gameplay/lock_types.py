@@ -17,4 +17,3 @@ class GameplayLockType(TypedDict):
     auto: AutoLockType
     fixed: FixedLockType
     resettable: ResettableLockType
-    colission_delay: CollisionDelayLockType

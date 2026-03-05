@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from config.gameplay import AutoLockType, CollisionDelayLockType, FixedLockType, ResettableLockType
+    from config.gameplay import AutoLockType, FixedLockType, ResettableLockType
     
 class LockStrategy(ABC):
     def __init__(self, name: str, lock_config: dict[str, Any]):
@@ -93,24 +93,4 @@ class ResettableLock(LockStrategy):
 
     def is_locked(self) -> bool:
         return self.timer >= self.delay or self._moves >= self._max_moves
-    
-
-class CollisionDelayLock(LockStrategy):
-    """Lock que solo cuenta el temporizador mientras la pieza colisiona"""
-    def __init__(self, name: str, lock_config: dict[str, Any]):
-        super().__init__(name, lock_config)
-        self._lock_config: "CollisionDelayLockType" = self._lock_config
-
-    def update(self, dt: float, is_colliding: bool) -> None:
-        if is_colliding:
-            self.timer += dt
-        else:
-            self.timer = 0.0
-
-    def on_move(self) -> None:
-        pass  # no se reinicia con movimientos, solo depende de la colisión
-
-    def is_locked(self) -> bool:
-        return self.timer >= self.delay
-    
 

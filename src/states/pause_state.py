@@ -18,12 +18,15 @@ class PauseState(GameState):
         self._build_ui()
     
     def on_enter(self) -> None:
-        pass
+        self.game.audio.pause_music()
     
     def on_exit(self) -> None:
-        pass
+        self.game.audio.unpause_music()
     
     def handle_input(self, events: list[pygame.event.Event]) -> None:
+        if self.menu.is_confirming:
+            return
+
         if self.game.input.is_action_pressed("ui", "pause"):
             self.game.audio.play_sfx("Select")
             self._on_resume()
@@ -58,8 +61,8 @@ class PauseState(GameState):
         options = [
             ("CONTINUAR", self._on_resume),
             ("REINICIAR", self._on_restart),
-            ("VOLVER AL MENU", self._on_menu),
-            ("OPCIONES", self._on_options)
+            ("OPCIONES", self._on_options),
+            ("VOLVER AL MENU", self._on_menu)
         ]
         
         self.menu = UIMenu("pause_menu", SCREEN_CENTER_W, 330,

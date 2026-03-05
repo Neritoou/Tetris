@@ -5,7 +5,7 @@ from src.states.types import StateID, OverlayType
 from src.states.game_state import GameState
 
 from src.constants import SCREEN_CENTER_W
-from src.ui import UIManager, UIMenu, UILabel
+from src.ui import UIManager, UIMenu
 
 if TYPE_CHECKING:
     from src.core.game import Game
@@ -35,6 +35,9 @@ class MenuState(GameState):
         self.ui.render(surface)
 
     def handle_input(self, events: list[pygame.event.Event]) -> None:
+        if self.menu.is_confirming:
+            return
+
         if self.game.input.is_action_pressed("ui", "up"):
             self.game.audio.play_sfx("Scroll")
             self.menu.move_up()
@@ -60,6 +63,7 @@ class MenuState(GameState):
         options_list =[
             ("JUGAR", self._on_play),
             ("OPCIONES", self._on_config),
+            ("RECORDS", self._on_records),
             ("SALIR", self._on_exit)
         ]
 
@@ -79,6 +83,9 @@ class MenuState(GameState):
     
     def _on_config(self):
         self.game.state.change(StateID.OPTIONS)
+
+    def _on_records(self):
+        self.game.state.change(StateID.RECORDS)
     
     def _on_exit(self):
         """Detiene y cierra la ventana del juego."""

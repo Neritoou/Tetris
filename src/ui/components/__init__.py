@@ -4,3 +4,4 @@ from src.ui.components.counter_label  import UICounterLabel
 from src.ui.components.menu import UIMenu
 from src.ui.components.button_menu import UIButtonMenu
 from src.ui.components.floating_label import UIFloatingLabel
+from src.ui.components.hint_bar import UIHintBar

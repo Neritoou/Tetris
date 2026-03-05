@@ -2,10 +2,13 @@ from enum import Enum, auto
 
 class StateID(Enum):
     MENU = auto()
+    RULESET_SELECT = auto()
     COUNTDOWN = auto()
     PLAY = auto()
     PAUSE = auto()
     GAME_OVER = auto()
+    OPTIONS = auto()
+    KEYBIND_EDITOR = auto()
     # Más estados
 
 # ENUM DE OVERLAYS PARA LOS ESTADOS DEL JUEGO

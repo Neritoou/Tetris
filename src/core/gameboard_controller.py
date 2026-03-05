@@ -1,6 +1,6 @@
 from pygame import Surface
 from typing import TYPE_CHECKING
-from src.constants import PIECE_DEFINITIONS, ROWS, COLS, BLOCK_W, BLOCK_H, PIECE_SPAWN_OFFSET
+from src.constants import PIECE_DEFINITIONS, ROWS, COLS, BLOCK_W, BLOCK_H, PIECE_SPAWN_OFFSET, HOLD_X, HOLD_Y
 from src.core.piece_bag import PieceBag
 from src.core.board import Board
 from src.core.piece import Piece
@@ -106,7 +106,9 @@ class GameBoardController:
 
         if self._hold_piece is not None:
             hold_surface = self._data[self._hold_piece.name]["surfaces"]["normal"]
-            surface.blit(hold_surface, (0, 0))  # (!) posición provisional
+            rect = hold_surface.get_rect(center=(HOLD_X, HOLD_Y))
+
+            surface.blit(hold_surface, rect)
 
         if self._piece is not None and not self._piece.is_locked():
             pos_normal = self._board.get_pixels_of_cell(self._piece.row, self._piece.col)

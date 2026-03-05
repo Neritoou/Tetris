@@ -27,20 +27,20 @@ class PlayState(GameState):
         self._shake = ScreenShake(intensity=4, duration=0.2)
         self._temp_surface = pygame.Surface(game.surface.get_size())
 
-        self.font = pygame.font.SysFont("Consolas", 20)  # (!) TEMPORAL
-
     def on_enter(self) -> None:
         self.pieces       = self.game.resources.get_pieces()
-        board_surface     = self.game.resources.get_image("Board")
+        self._board     = self.game.resources.get_image("Board")
+
+        board_surface = pygame.Surface((270, 600), pygame.SRCALPHA)
 
         board_config: "BoardType" = {
             "surface": board_surface,
-            "pos_x":   BOARD_X,
+            "pos_x":   BOARD_X + 163,
             "pos_y":   BOARD_Y,
         }
         preview_config: "PiecesPreviewType" = {
-            "pos_x":         BOARD_X + board_surface.get_width() + 20,
-            "pos_y":         BOARD_Y,
+            "pos_x":         BOARD_X + 480,
+            "pos_y":         BOARD_Y + 90,
             "max_width":     80,
             "margin":        8,
             "preview_count": self.session_config["general"]["preview_count"],
@@ -69,9 +69,9 @@ class PlayState(GameState):
             self.session.move_right()
         if self.game.input.is_action_pressed("play", "move_down"):
             self.session.soft_drop()
-        if self.game.input.is_action_pressed("play", "rotate_piece_right"):
+        if self.game.input.is_action_pressed("play", "rotate_right"):
             self.session.rotate_right()
-        if self.game.input.is_action_pressed("play", "rotate_piece_left"):
+        if self.game.input.is_action_pressed("play", "rotate_left"):
             self.session.rotate_left()
         if self.game.input.is_action_pressed("play", "hard_drop"):
             self.session.hard_drop()
@@ -98,12 +98,14 @@ class PlayState(GameState):
 
     def render(self, surface: pygame.Surface) -> None:
         target = self._temp_surface if self._shake.is_active else surface
-        target.fill((30, 30, 30))
+
+        target.blit(self.game.background, (0, 0))
+        target.blit(self._board, (BOARD_X, BOARD_Y))
+
         self.session.draw(target, self.pieces)
-        self.session.debug_draw(target, self.font)
 
         if self._shake.is_active:
-            surface.fill((30, 30, 30))
+            surface.fill((0, 0, 0))
             surface.blit(target, self._shake.offset)
 
     def _start_game(self) -> None:

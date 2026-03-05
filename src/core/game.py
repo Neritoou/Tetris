@@ -26,7 +26,9 @@ class Game(GameBase):
         self.database.load()
         self.state.change(StateID.MENU)
         self.audio.register_sounds(self.resources.get_sounds())
-    
+
+        self.background = self.resources.get_image("Background")
+
     def handle_events(self, events: list[pygame.event.Event]) -> None:
         self.input.update(events)
         self.state.handle_input(events)

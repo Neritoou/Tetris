@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from config.gameplay import AutoLockType, ColissionDelayLockType, FixedLockType, ResettableLockType
+    from config.gameplay import AutoLockType, CollisionDelayLockType, FixedLockType, ResettableLockType
     
 class LockStrategy(ABC):
     def __init__(self, name: str, lock_config: dict[str, Any]):
@@ -19,6 +19,7 @@ class LockStrategy(ABC):
     def reset_timer(self) -> None:
         """ Establece el contador de bloqueo en 0.0"""
         self.timer = 0.0
+        self._moves = 0
     
     @abstractmethod
     def update(self, dt: float, is_colliding: bool) -> None:
@@ -98,7 +99,7 @@ class CollisionDelayLock(LockStrategy):
     """Lock que solo cuenta el temporizador mientras la pieza colisiona"""
     def __init__(self, name: str, lock_config: dict[str, Any]):
         super().__init__(name, lock_config)
-        self._lock_config: "ColissionDelayLockType" = self._lock_config
+        self._lock_config: "CollisionDelayLockType" = self._lock_config
 
     def update(self, dt: float, is_colliding: bool) -> None:
         if is_colliding:

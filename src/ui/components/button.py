@@ -14,7 +14,8 @@ class UIButton(UIElement):
     def __init__(
             self, name: str, x: int, y: int, callback_function: Callable[[], None],
             base_button: pygame.Surface, selected_button: pygame.Surface,
-            *, text: Optional["UILabel"] = None, visible: bool = True, alpha: int = 255
+            *, text: Optional["UILabel"] = None, text_y: int = 0,
+            visible: bool = True, alpha: int = 255
     ):
         """
         Inicializa las propiedades de un botón.
@@ -38,9 +39,13 @@ class UIButton(UIElement):
         self._text = text
 
         self._is_selected: bool = False
-
-        if self._text:
+        
+        self.text_y = text_y
+        
+        if text_y == 0:
             self._center_text_on_button()
+        else:
+            self._pos_text(text_y)
 
 
 
@@ -58,7 +63,11 @@ class UIButton(UIElement):
         """Actualiza el texto del botón de ser necesario."""
         if self._text:
             self._text.set_text(new_text)
-            self._center_text_on_button()
+
+            if self._text and self.text_y == 0:
+                self._center_text_on_button()
+            else:
+                self._pos_text(self.text_y)
 
 
 
@@ -98,3 +107,8 @@ class UIButton(UIElement):
         """Centra el texto sobre el botón."""
         if self._text:
             self._text.rect.center = self.rect.center
+
+    def _pos_text(self, y: int = 10) -> None:
+        if self._text:
+            self._text.rect.centerx = self.rect.centerx
+            self._text.rect.y = self.rect.y + y

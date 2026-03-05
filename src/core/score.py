@@ -12,14 +12,16 @@ class Score:
     """
     def __init__(self, gameplay_config: "GameplayConfigType"):
         self.config = gameplay_config
+
         self.current_score: int  = 0
         self.aux_score: int  = 0
+
         self.combo_count: int  = 0
         self.back_to_back_active: bool = False
+
         self.level: int  = self.config["general"]["starting_level"]
         self.lines_cleared_total: int = 0
         self.tetrises: int = 0
-
 
         self.soft_drop: int = 0
         self.prev_soft_drop: int = 0
@@ -27,26 +29,26 @@ class Score:
         self.hard_drop: int = 0
         self.prev_hard_drop: int = 0
 
-        self.debug_lines_cleared = 0  # (!) QUITAR
-        self.debug_move_type = ""     # (!) QUITAR
+        self._lines_cleared = 0
 
     def update(self, lines_cleared: int, move_type: str) -> None:
         self.prev_soft_drop = self.soft_drop
         self.prev_hard_drop = self.hard_drop
         self.aux_score = 0
 
-
-        self.debug_move_type = move_type          # (!) QUITAR
-        self.debug_lines_cleared = lines_cleared  # (!) QUITAR
+        self._lines_cleared = lines_cleared
 
         if self.soft_drop > 0: self.apply_soft_drop(self.soft_drop)
         if self.hard_drop > 0: self.apply_hard_drop(self.hard_drop)
+
         self.hard_drop = 0
         self.soft_drop = 0
 
         if lines_cleared:
             self.lines_cleared_total += lines_cleared
+
             if lines_cleared == 4: self.tetrises += 1
+
             self.apply_lines_cleared(lines_cleared, move_type)
             self.apply_back_to_back(lines_cleared, move_type)
             self.apply_combo()
@@ -134,8 +136,7 @@ class Score:
             "", "", "CHANGES:",
             f"Previous Soft Drop: {self.prev_soft_drop} x{self.config['score']['soft_drop']} ({self.prev_soft_drop * self.config['score']['soft_drop']})",
             f"Previous Hard Drop: {self.prev_hard_drop} x{self.config['score']['hard_drop']} ({self.prev_hard_drop * self.config['score']['hard_drop']})",
-            f"Previous Lines Cleared: {self.debug_lines_cleared}",
-            f"Previous Move Type: {self.debug_move_type}",
+            f"Previous Lines Cleared: {self._lines_cleared}"
         ]
 
         for i, text in enumerate(debug_texts):

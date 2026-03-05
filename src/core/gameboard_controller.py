@@ -49,10 +49,27 @@ class GameBoardController:
         self._preview   = PiecesPreview(data=pieces, bag=self._bag, preview=preview)
         self._mechanics = PieceMechanics(gravity, lock, self._board, wall_kicks=wall_kicks)
 
+    @property
+    def last_score_gained(self) -> int:
+        """Devuelve los puntos obtenidos en la última pieza bloqueada."""
+        return self._score.aux_score
+
+    @property
+    def last_lines_cleared(self) -> int:
+        """Devuelve cuántas líneas se eliminaron en el último bloqueo."""
+        return self._score._lines_cleared
 
     @property 
     def current_score(self) -> int:
         return self._score.current_score
+    
+    @property
+    def current_level(self) -> int:
+        return self._score.level
+
+    @property
+    def total_lines_cleared(self) -> int:
+        return self._score.lines_cleared_total
     
     @property
     def final_stats(self) -> "RawRecord":
@@ -65,7 +82,10 @@ class GameBoardController:
             "date": date.today().isoformat()
         }
     
+
+
     # --- CICLO DE JUEGO ---
+
     def start(self) -> None:
         """Inicia la partida generando la primera pieza."""
         self._spawn_piece()
@@ -191,6 +211,8 @@ class GameBoardController:
             return True
         return False
 
+
+
     # --- ESTADO ---
 
     def is_game_over(self) -> bool:
@@ -201,6 +223,8 @@ class GameBoardController:
         fall = (self._mechanics.get_fall_delay(self._score.level), self._mechanics.fall_timer)
         lock = (self._mechanics.lock_delay, self._mechanics.lock_timer)
         self._score.debug_draw(surface, font, fall, lock)
+
+
 
     # --- HELPERS INTERNOS ---
 
@@ -239,5 +263,3 @@ class GameBoardController:
         self._last_action_was_rotation = False
         self._mechanics.reset()
         self._piece_just_locked = True
-
-
